@@ -3,665 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>家庭用ダッシュボード (Safari iOS 12対応版)</title>
-  
-  <!-- React & ReactDOM 17 (Legacy Support) -->
+  <title>HOMEDASH</title>
   <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-
   <style>
-    /* --- Base Styles --- */
     :root {
-      --primary: #3b82f6;
-      --primary-dark: #2563eb;
-      --secondary: #64748b;
-      --bg: #F8FAFC;
-      --text: #1e293b;
-      --white: #ffffff;
-      --emerald: #10b981;
-      --orange: #f59e0b;
-      --rose: #f43f5e;
-      --indigo: #6366f1;
-      --slate-50: #f8fafc;
-      --slate-100: #f1f5f9;
-      --slate-200: #e2e8f0;
-      --slate-300: #cbd5e1;
-      --slate-400: #94a3b8;
-      --slate-500: #64748b;
-      --slate-600: #475569;
-      --slate-700: #334155;
-      --slate-800: #1e293b;
+      --primary: #3b82f6; --primary-dark: #2563eb; --accent: #10b981;
+      --bg: #f8fafc; --bg-panel: #ffffff; --bg-panel-hover: #f1f5f9;
+      --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
+      --red: #ef4444; --blue: #3b82f6; --yellow: #f59e0b;
+      --shadow: 0 4px 20px rgba(0,0,0,0.06); --shadow-hover: 0 8px 30px rgba(0,0,0,0.1);
     }
-
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%;
       background-color: var(--bg); color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-      overflow: hidden; position: fixed;
-      -webkit-font-smoothing: antialiased;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden; position: fixed; -webkit-font-smoothing: antialiased;
     }
-
     #root { width: 100%; height: 100%; display: flex; flex-direction: column; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    /* --- Layout Components --- */
-    .app-layout { 
-      display: flex; flex-direction: column; height: 100%; width: 100%; overflow: hidden; 
-      /* Safari 12 viewport fix */
-      height: 100vh; height: -webkit-fill-available;
-    }
-
-    /* Fixed Header for Desktop/iPad */
+    .app-layout { display: flex; flex-direction: column; height: 100vh; height: -webkit-fill-available; width: 100%; overflow: hidden; }
     .header { 
-      display: none; background: rgba(255, 255, 255, 0.95); height: 72px; 
-      border-bottom: 1px solid var(--slate-200); padding: 0 32px; align-items: center; justify-content: space-between;
-      z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); height: 70px; 
+      border-bottom: 1px solid var(--border); padding: 0 32px; align-items: center; justify-content: space-between; z-index: 100;
     }
-    @media (min-width: 768px) { .header { display: flex; } }
-    
-    .logo { font-size: 24px; font-weight: 900; letter-spacing: -0.025em; color: var(--slate-800); }
+    .logo { font-size: 24px; font-weight: 900; letter-spacing: -1px; color: var(--text); font-style: italic; }
     .logo span { color: var(--primary); }
-
-    .header-nav { display: flex; background: var(--slate-100); padding: 4px; border-radius: 12px; }
+    .header-nav { display: flex; background: var(--bg-panel-hover); padding: 4px; border-radius: 12px; }
     .header-nav-btn { 
       border: none; background: transparent; padding: 8px 20px; border-radius: 8px; 
-      font-weight: bold; font-size: 14px; cursor: pointer; color: var(--slate-500); transition: all 0.2s;
+      font-weight: bold; font-size: 14px; cursor: pointer; color: var(--text-muted); transition: all 0.2s;
     }
-    .header-nav-btn.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-    /* Main Content */
+    .header-nav-btn.active { background: var(--bg-panel); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .main-content { flex: 1; position: relative; overflow: hidden; }
     .scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .container { max-width: 1600px; margin: 0 auto; width: 100%; }
-
-    /* Fixed Bottom Nav for Mobile */
     .bottom-nav { 
       position: fixed; bottom: 0; left: 0; right: 0; height: 75px; 
-      background: rgba(255, 255, 255, 0.98); border-top: 1px solid var(--slate-100); 
+      background: rgba(255, 255, 255, 0.95); border-top: 1px solid var(--border); 
       display: flex; justify-content: space-around; padding: 5px 15px; z-index: 1000;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.08); 
-      /* Safe area inset */
-      padding-bottom: constant(safe-area-inset-bottom);
-      padding-bottom: env(safe-area-inset-bottom);
+      padding-bottom: constant(safe-area-inset-bottom); padding-bottom: env(safe-area-inset-bottom);
     }
     @media (min-width: 768px) { .bottom-nav { display: none; } }
-    
     .nav-item { 
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      border: none; background: none; color: var(--slate-400); font-size: 10px; font-weight: 800;
-      transition: all 0.3s; position: relative;
+      border: none; background: none; color: var(--text-muted); font-size: 10px; font-weight: 800; transition: all 0.3s; position: relative;
     }
     .nav-item.active { color: var(--primary); transform: translateY(-3px); }
     .nav-icon { font-size: 26px; margin-bottom: 2px; transition: transform 0.3s; }
     .nav-item.active .nav-icon { transform: scale(1.15); }
-    .nav-indicator { 
-      width: 4px; height: 4px; background: var(--primary); border-radius: 50%; opacity: 0; 
-      position: absolute; bottom: 4px; transition: opacity 0.3s;
-    }
-    .nav-item.active .nav-indicator { opacity: 1; }
-
-    /* --- Widget Design System --- */
     .widget-container { 
-      background: var(--white); border-radius: 24px; border: 1px solid var(--slate-100); 
-      padding: 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.02); transition: all 0.3s;
+      background: var(--bg-panel); border-radius: 20px; border: 1px solid var(--border); 
+      padding: 24px; box-shadow: var(--shadow); transition: all 0.3s;
       display: flex; flex-direction: column; position: relative; overflow: hidden;
     }
-    .widget-container:hover { border-color: var(--slate-200); box-shadow: 0 8px 32px rgba(0,0,0,0.04); }
-    
-    .widget-title { 
-      font-size: 16px; font-weight: 900; margin-bottom: 16px; color: var(--slate-700); 
-      display: flex; align-items: center; letter-spacing: -0.01em;
-    }
+    .widget-container:hover { border-color: #cbd5e1; box-shadow: var(--shadow-hover); }
+    .widget-title { font-size: 16px; font-weight: 900; margin-bottom: 16px; color: var(--text); display: flex; align-items: center; letter-spacing: -0.01em; }
     .widget-icon { margin-right: 8px; font-size: 1.2em; }
-
-    /* Gradients */
-    .bg-indigo-gradient { background: linear-gradient(135deg, #6366f1, #4338ca); color: var(--white); }
-    .bg-blue-gradient { background: linear-gradient(135deg, #60a5fa, #06b6d4); color: var(--white); }
-    .bg-orange-gradient { background: linear-gradient(135deg, #fb923c, #fb7185); color: var(--white); }
-
-    /* --- Utility --- */
+    .bg-blue-gradient { background: linear-gradient(135deg, #eff6ff, #dbeafe); color: var(--text); border: 1px solid #bfdbfe; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .flex { display: flex; } .flex-col { flex-direction: column; } .grow { flex-grow: 1; } .shrink-0 { flex-shrink: 0; }
+    .items-center { align-items: center; } .justify-center { justify-content: center; } .justify-between { justify-content: space-between; }
+    .text-center { text-align: center; } .w-full { width: 100%; } .h-full { height: 100%; }
+    .gap-1 > * + * { margin-left: 4px; } .gap-2 > * + * { margin-left: 8px; } .gap-3 > * + * { margin-left: 12px; } .gap-4 > * + * { margin-left: 16px; } .flex-wrap { flex-wrap: wrap; }
+    .flex-col.gap-2 > * + * { margin-top: 8px; margin-left: 0; } .flex-col.gap-4 > * + * { margin-top: 16px; margin-left: 0; }
 
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .grow { flex-grow: 1; }
-    .shrink-0 { flex-shrink: 0; }
-    .items-center { align-items: center; }
-    .justify-center { justify-content: center; }
-    .justify-between { justify-content: space-between; }
-    .text-center { text-align: center; }
-    .w-full { width: 100%; }
-    .h-full { height: 100%; }
+    /* Header Clock */
+    .header-clock { display: flex; align-items: center; margin-left: 16px; background: rgba(59, 130, 246, 0.1); padding: 4px 12px; border-radius: 12px; }
+    .header-clock-date { font-size: 11px; font-weight: 700; color: var(--primary); margin-right: 8px; }
+    .header-clock-time { font-size: 18px; font-weight: 900; color: var(--primary-dark); letter-spacing: -0.5px; }
+    .pulse-dot { animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-    /* Flex Gap Polyfill */
-    .gap-1 > * + * { margin-left: 4px; }
-    .gap-2 > * + * { margin-left: 8px; }
-    .gap-3 > * + * { margin-left: 12px; }
-    .gap-4 > * + * { margin-left: 16px; }
-    .gap-6 > * + * { margin-left: 24px; }
-    
-    .flex-col.gap-1 > * + * { margin-top: 4px; margin-left: 0; }
-    .flex-col.gap-2 > * + * { margin-top: 8px; margin-left: 0; }
-    .flex-col.gap-3 > * + * { margin-top: 12px; margin-left: 0; }
-    .flex-col.gap-4 > * + * { margin-top: 16px; margin-left: 0; }
-    .flex-col.gap-6 > * + * { margin-top: 24px; margin-left: 0; }
-
-    /* --- Clock Widget --- */
-    .clock-date { font-size: 12px; font-weight: 500; opacity: 0.9; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; }
-    .clock-time { font-size: 32px; font-weight: 900; letter-spacing: -0.05em; display: flex; align-items: center; }
-    .clock-time.with-seconds { font-size: 24px; }
-    .pulse-dot { opacity: 0.8; padding-bottom: 4px; margin: 0 4px; animation: pulse 1s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
-
-    /* --- Weather Widget --- */
-    .weather-widget-horizontal { 
-      flex-direction: row !important; 
-      align-items: center !important; 
-      padding: 16px 24px !important;
-      gap: 20px !important;
-    }
-    .weather-info-mini {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100px;
-      flex-shrink: 0;
-      border-right: 1px solid rgba(255,255,255,0.2);
-      padding-right: 20px;
-    }
+    /* Weather Widget */
+    .weather-widget-horizontal { flex-direction: row !important; align-items: center !important; padding: 16px 24px !important; gap: 20px !important; }
+    .weather-info-mini { display: flex; flex-direction: column; align-items: center; width: 100px; flex-shrink: 0; border-right: 1px solid #bfdbfe; padding-right: 20px; }
     .weather-loc { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
-    .weather-desc { font-size: 10px; opacity: 0.8; text-align: center; }
-    .weather-temp-now { font-size: 32px; font-weight: 900; line-height: 1; margin: 8px 0; }
-    .weather-temp-range { display: flex; gap: 8px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.15); padding: 2px 10px; border-radius: 20px; width: max-content; }
-    
+    .weather-desc { font-size: 10px; font-weight: bold; opacity: 0.8; text-align: center; }
+    .weather-temp-now { font-size: 38px; font-weight: 900; line-height: 1; margin: 8px 0; color: var(--primary); }
     .hourly-scroll { display: flex; overflow-x: auto; padding: 4px 0; flex: 1; -webkit-overflow-scrolling: touch; }
-    .hourly-item { flex: 0 0 100px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; margin-right: 12px; }
-    .hourly-time { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
-    .hourly-icon { font-size: 36px; margin-bottom: 4px; }
-    .hourly-temp { font-size: 20px; font-weight: 800; }
-    .hourly-pop { font-size: 14px; font-weight: 800; color: #bae6fd; }
+    .hourly-item { flex: 0 0 100px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.6); border-radius: 16px; padding: 12px; margin-right: 12px; }
+    .hourly-time { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); }
+    .hourly-icon { font-size: 32px; margin-bottom: 4px; }
+    .hourly-temp { font-size: 20px; font-weight: 800; color: var(--text); }
+    .hourly-pop { font-size: 13px; font-weight: 800; color: var(--blue); }
 
-    /* --- Transit Helper --- */
-    .transit-item { background: var(--slate-50); border-radius: 16px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border: 1px solid transparent; }
-    .transit-item.active { background: #eff6ff; border-color: #dbeafe; }
-    .transit-item.active-orange { background: #fff7ed; border-color: #ffedd5; }
-    .transit-time { font-size: 24px; font-weight: 900; color: var(--slate-800); font-variant-numeric: tabular-nums; }
-    .transit-dest { font-size: 12px; font-weight: 700; color: var(--slate-500); margin-left: 8px; }
-    .transit-diff { font-size: 13px; font-weight: 900; color: var(--slate-400); }
-    .transit-item.active .transit-diff { color: var(--primary); }
-    .transit-item.active-orange .transit-diff { color: var(--orange); }
+    /* Transit Helper */
+    .transit-item { background: var(--bg-panel-hover); border-radius: 16px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border: 1px solid #e2e8f0; }
+    .transit-time { font-size: 20px; font-weight: 900; color: var(--text); font-variant-numeric: tabular-nums; }
+    .transit-dest { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-left: 8px; }
+    .transit-diff { font-size: 14px; font-weight: 900; color: var(--primary); }
 
-    /* --- Calendar / TODO --- */
-    .todo-input-group { display: flex; background: var(--slate-100); padding: 6px; border-radius: 16px; margin-bottom: 12px; }
-    .todo-input { border: none; background: transparent; padding: 0 12px; font-weight: bold; font-size: 14px; flex: 1; outline: none; }
-    .btn-add { 
-      background: var(--primary); color: white; border: none; width: 40px; height: 40px; 
-      border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer;
-    }
-    
-    .todo-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dotted var(--slate-200); }
-    .checkbox { 
-      width: 22px; height: 22px; border: 2px solid var(--slate-300); border-radius: 6px; position: relative; cursor: pointer; margin-right: 12px;
-      transition: all 0.2s;
-    }
-    .checkbox.checked { background: var(--primary); border-color: var(--primary); }
+    /* Calendar / TODO / Form */
+    .todo-input-group { display: flex; background: var(--bg-panel-hover); padding: 6px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
+    .todo-input { border: none; background: transparent; padding: 0 12px; font-weight: bold; font-size: 14px; flex: 1; outline: none; color: var(--text); }
+    .btn-add { background: var(--accent); color: white; border: none; width: 40px; height: 40px; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; }
+    .todo-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dotted var(--border); }
+    .checkbox { width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 6px; position: relative; cursor: pointer; margin-right: 12px; transition: all 0.2s; background: white; }
+    .checkbox.checked { background: var(--accent); border-color: var(--accent); }
     .checkbox.checked::after { content: '✓'; color: white; position: absolute; top: 0; left: 0; width: 100%; height: 100%; text-align: center; font-size: 14px; font-weight: bold; }
-    .todo-text { font-size: 14px; font-weight: 700; color: var(--slate-700); flex: 1; }
-    .todo-text.checked { text-decoration: line-through; color: var(--slate-400); }
+    .todo-text { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
+    .todo-text.checked { text-decoration: line-through; color: var(--text-muted); }
     
-    /* --- Grid Layouts --- */
-    .main-grid { display: block; padding: 16px; padding-bottom: 100px; }
-    @media (min-width: 1024px) {
-      .main-grid { display: flex; gap: 24px; padding: 24px; }
-      .side-col { flex: 0 0 320px; }
-      .main-col { flex: 1; }
-    }
-    
-    .grid-vertical { display: flex; flex-direction: column; }
-    .grid-vertical.gap-6 > * + * { margin-top: 24px; }
-
-    .todo-flex-grid { display: block; padding: 16px; padding-bottom: 100px; }
-    @media (min-width: 768px) {
-      .todo-flex-grid { display: flex; gap: 20px; padding: 24px; }
-      .todo-col { flex: 1; min-width: 0; }
-    }
-
-    /* --- Form Elements --- */
-    .input-field { 
-      width: 100%; padding: 12px 16px; border: 1px solid var(--slate-200); border-radius: 16px; 
-      font-size: 16px; /* 16px prevents auto-zoom on iOS */
-      font-weight: bold; color: var(--slate-700); outline: none; transition: border 0.3s;
-    }
+    .input-field { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; font-weight: bold; color: var(--text); background: white; outline: none; transition: border 0.3s; }
     .input-field:focus { border-color: var(--primary); }
-    
-    .select-field {
-      padding: 8px 12px; border: 1px solid var(--slate-200); border-radius: 10px;
-      font-size: 13px; font-weight: bold; background: white; outline: none;
-    }
+    .select-field { padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-weight: bold; background: white; color: var(--text); outline: none; }
+    .btn-blue { background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; }
+    .btn-ghost { background: transparent; color: var(--text-muted); padding: 8px 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+    .btn-ghost:hover { background: var(--bg-panel-hover); color: var(--text); }
 
-    .btn-blue { background: var(--primary); color: white; padding: 12px 24px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; }
-    .btn-ghost { background: transparent; color: var(--slate-500); padding: 8px 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
-    
+    /* Calendar Grid */
+    .cal-table { width: 100%; border-collapse: collapse; min-width: 700px; table-layout: fixed; }
+    .cal-table th { padding: 16px 8px; text-align: center; border-bottom: 2px solid var(--border); }
+    .cal-table td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--bg-panel-hover); cursor: pointer; }
+
     /* Document Table */
-    .doc-table-wrapper { overflow-x: auto; border-radius: 20px; border: 1px solid var(--slate-100); }
-    .doc-table { width: 100%; border-collapse: collapse; min-width: 800px; }
-    .doc-table th { background: var(--slate-50); padding: 12px; text-align: left; font-size: 11px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; }
-    .doc-table td { padding: 15px 12px; border-bottom: 1px solid var(--slate-100); font-size: 14px; font-weight: 700; color: var(--slate-700); }
+    .doc-table-wrapper { overflow-x: auto; border-radius: 20px; border: 1px solid var(--border); }
+    .doc-table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
+    .doc-table th { background: var(--bg-panel-hover); padding: 12px; text-align: left; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .doc-table td { padding: 15px 12px; border-bottom: 1px solid var(--bg-panel-hover); font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { background: white; width: 100%; max-width: 320px; border-radius: 24px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; }
   </style>
 </head>
 <body>
   <div id="root"></div>
-
   <script>
-    // --- React Helpers ---
     var e = React.createElement;
     var useState = React.useState;
     var useEffect = React.useEffect;
 
-    // --- Utility Functions ---
-    function formatTime(date) {
-      var h = String(date.getHours()).padStart(2, '0');
-      var m = String(date.getMinutes()).padStart(2, '0');
-      return { h, m };
-    }
+    var apiService = {
+      gasUrl: 'https://script.google.com/macros/s/AKfycbxb4FaW4LC834teaFYzsZzEQQE85hjN-pmfrgIrkXQ88aZ9EcM6ELTLviG7ITytH8_7/exec',
+      fetchJsonp: function(action, data) {
+        return new Promise(function(resolve, reject) {
+          if (!apiService.gasUrl || apiService.gasUrl.indexOf('http') !== 0) {
+            if (action === 'getShopping') {
+              var m = localStorage.getItem('mockS'); resolve(m ? JSON.parse(m) : [{id:1,name:'牛乳',qty:'1',checked:false,category:'全般'}]);
+            } else if (action === 'saveShopping') {
+              localStorage.setItem('mockS', JSON.stringify(data)); resolve({success:true});
+            } else resolve({});
+            return;
+          }
+          var cb = 'cb_' + Math.round(1000000*Math.random());
+          var url = apiService.gasUrl + '?action=' + action + '&callback=' + cb;
+          if (data) url += '&data=' + encodeURIComponent(JSON.stringify(data));
+          var script = document.createElement('script'); script.id=cb; script.src=url;
+          window[cb] = function(res) { resolve(res); delete window[cb]; var s=document.getElementById(cb); if(s)s.parentNode.removeChild(s); };
+          script.onerror = function() { reject(new Error("Net Err")); };
+          document.body.appendChild(script);
+        });
+      }
+    };
 
-    function formatDate(date) {
-      var days = ['日', '月', '火', '水', '木', '金', '土'];
-      var m = date.getMonth() + 1;
-      var d = date.getDate();
-      var day = days[date.getDay()];
-      return m + '月' + d + '日 (' + day + ')';
-    }
-
-    // --- Components ---
-
-    // 1. Clock Widget
-    function ClockWidget() {
-      var [time, setTime] = useState(new Date());
-      var [showSeconds, setShowSeconds] = useState(false);
-      useEffect(function() {
-        var timer = setInterval(function() { setTime(new Date()); }, 1000);
-        return function() { clearInterval(timer); };
-      }, []);
-  
-      var h = String(time.getHours()).padStart(2, '0');
-      var m = String(time.getMinutes()).padStart(2, '0');
-      var s = String(time.getSeconds()).padStart(2, '0');
-  
-      return e('div', { 
-          className: 'widget-container bg-indigo-gradient items-center',
-          style: { cursor: 'pointer' },
-          onClick: function() { setShowSeconds(!showSeconds); }
-        },
-        e('div', { className: 'clock-date' }, formatDate(time)),
-        e('div', { className: 'clock-time' + (showSeconds ? ' with-seconds' : '') },
-          e('span', null, h),
-          e('span', { className: 'pulse-dot' }, ':'),
-          e('span', null, m),
-          showSeconds && e('span', { className: 'pulse-dot' }, ':'),
-          showSeconds && e('span', null, s)
-        ),
-        e('div', { style: { position: 'absolute', bottom: '-20px', right: '-20px', fontSize: '80px', opacity: '0.1', pointerEvents: 'none' } }, '🕒')
+    function HeaderClockWidget() {
+      var [t, setT] = useState(new Date()), [s, setS] = useState(false);
+      useEffect(function() { var tm=setInterval(function(){setT(new Date());},1000); return function(){clearInterval(tm);}; }, []);
+      var h = String(t.getHours()).padStart(2, '0');
+      var m = String(t.getMinutes()).padStart(2, '0');
+      var ms = String(t.getSeconds()).padStart(2, '0');
+      var ds = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      var dateStr = (t.getMonth()+1)+'/'+t.getDate()+' ('+ds[t.getDay()]+')';
+      return e('div', { className: 'header-clock', onClick: function(){setS(!s);}, style: { cursor: 'pointer' } },
+        e('span', { className: 'header-clock-date' }, dateStr),
+        e('span', { className: 'header-clock-time' }, h, e('span', {className:'pulse-dot'}, ':'), m, s && e('span', null, e('span', {style:{fontSize:'0.6em', opacity:0.7, margin:'0 2px'}}, ':'), ms))
       );
     }
 
-    // 2. Weather Widget
     function WeatherWidget() {
-      var [weather, setWeather] = useState(null);
-      var [loading, setLoading] = useState(true);
-
+      var [w, setW] = useState(null), [ld, setLd] = useState(true);
       useEffect(function() {
-        var url = 'https://api.open-meteo.com/v1/forecast?latitude=43.1907&longitude=141.0023&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,precipitation_probability,weathercode&current_weather=true&timezone=Asia%2FTokyo';
-        fetch(url)
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            if (data && data.current_weather) {
-              var now = new Date();
-              var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-              var tomorrow = new Date(today.getTime() + 86400000);
-              var dayAfter = new Date(tomorrow.getTime() + 86400000);
-              
-              var hourlyToday = [];
-              var hourlyTomorrow = [];
-              
-              for (var i = 0; i < data.hourly.time.length; i++) {
-                // Safari 12 fix: replace '-' with '/' and 'T' with space
-                var timeStr = data.hourly.time[i].replace(/-/g, '/').replace('T', ' ');
-                var t = new Date(timeStr);
-                
-                var item = {
-                  time: t.getHours() + '時',
-                  temp: Math.round(data.hourly.temperature_2m[i]),
-                  pop: data.hourly.precipitation_probability[i] || 0,
-                  icon: getWeatherIcon(data.hourly.weathercode[i])
-                };
-
-                if (t >= new Date(now.getTime() - 3600000) && t < tomorrow) {
-                  hourlyToday.push(item);
-                } else if (t >= tomorrow && t < dayAfter) {
-                  hourlyTomorrow.push(item);
-                }
+        fetch('https://api.open-meteo.com/v1/forecast?latitude=43.1907&longitude=141.0023&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,precipitation_probability,weathercode&current_weather=true&timezone=Asia%2FTokyo')
+          .then(function(r){return r.json();})
+          .then(function(d) {
+            if (d && d.current_weather) {
+              var now = new Date(), tom = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+              var hT = [], hTo = [];
+              for(var i=0; i<d.hourly.time.length; i++) {
+                var tm = new Date(d.hourly.time[i].replace(/-/g, '/').replace('T', ' '));
+                var it = { time: tm.getHours()+'時', temp: Math.round(d.hourly.temperature_2m[i]), pop: d.hourly.precipitation_probability[i]||0, icon: getIco(d.hourly.weathercode[i]) };
+                if (tm >= new Date(now.getTime()-3600000) && tm < tom) hT.push(it);
+                else if (tm >= tom && tm < new Date(tom.getTime()+86400000)) hTo.push(it);
               }
-              
-              setWeather({
-                temp: Math.round(data.current_weather.temperature),
-                high: Math.round(data.daily.temperature_2m_max[0]),
-                low: Math.round(data.daily.temperature_2m_min[0]),
-                icon: getWeatherIcon(data.current_weather.weathercode),
-                desc: getWeatherDesc(data.current_weather.weathercode),
-                hourlyToday: hourlyToday,
-                hourlyTomorrow: hourlyTomorrow
-              });
+              setW({ temp: Math.round(d.current_weather.temperature), icon: getIco(d.current_weather.weathercode), desc: getDsc(d.current_weather.weathercode), t: hT, to: hTo });
             }
-            setLoading(false);
-          })
-          .catch(function(err) { console.error(err); setLoading(false); });
+            setLd(false);
+          }).catch(function(){setLd(false);});
       }, []);
-
-      function getWeatherIcon(code) {
-        if (code === 0) return '☀️';
-        if (code <= 3) return '🌤️';
-        if (code >= 61 && code <= 65) return '☔';
-        if (code >= 71 && code <= 77) return '⛄';
-        return '☁️';
-      }
-      function getWeatherDesc(code) {
-        if (code === 0) return '快晴';
-        if (code <= 3) return '晴/曇';
-        if (code >= 61 && code <= 65) return '雨';
-        if (code >= 71 && code <= 77) return '雪';
-        return '曇り';
-      }
-
-      var content;
-      if (loading) {
-        content = e('div', { className: 'text-center py-10' }, '取得中...');
-      } else if (!weather) {
-        content = e('div', { className: 'text-center' }, 'データ取得エラー');
-      } else {
-        content = e('div', { className: 'flex', style: { width: '100%', alignItems: 'center' } },
+      function getIco(c) { if(c===0)return'☀️'; if(c<=3)return'🌤️'; if(c>=61&&c<=65)return'☔'; if(c>=71&&c<=77)return'⛄'; return'☁️'; }
+      function getDsc(c) { if(c===0)return'快晴'; if(c<=3)return'晴/曇'; if(c>=61&&c<=65)return'雨'; if(c>=71&&c<=77)return'雪'; return'曇り'; }
+      if(ld) return e('div', {className:'widget-container bg-blue-gradient text-center py-10 w-full'}, '取得中...');
+      if(!w) return e('div', {className:'widget-container bg-blue-gradient text-center w-full'}, 'エラー');
+      return e('div', { className: 'widget-container bg-blue-gradient weather-widget-horizontal w-full h-full' },
+        e('div', { className: 'flex', style: { width: '100%', alignItems: 'center' } },
           e('div', { className: 'weather-info-mini' },
-            e('div', { className: 'weather-loc' }, '小樽'),
-            e('div', { style: { fontSize: '32px', margin: '4px 0' } }, weather.icon),
-            e('div', { className: 'weather-temp-now' }, weather.temp + '°'),
-            e('div', { className: 'weather-desc' }, weather.desc)
+            e('div', { className: 'weather-loc' }, '小樽'), e('div', { style: { fontSize: '42px', margin: '4px 0' } }, w.icon),
+            e('div', { className: 'weather-temp-now' }, w.temp + '°'), e('div', { className: 'weather-desc' }, w.desc)
           ),
-          e('div', { className: 'grow hide-scrollbar', style: { maxHeight: '135px', overflowY: 'auto' } },
-            e('div', { style: { marginBottom: '0', minHeight: '135px' } },
-              e('div', { style: { fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', opacity: 0.8 } }, '今日'),
-              e('div', { className: 'hourly-scroll hide-scrollbar' },
-                weather.hourlyToday.map(function(h, i) {
-                  return e('div', { key: i, className: 'hourly-item' },
-                    e('span', { className: 'hourly-time' }, h.time),
-                    e('span', { className: 'hourly-icon' }, h.icon),
-                    e('span', { className: 'hourly-temp' }, h.temp + '°'),
-                    e('span', { className: 'hourly-pop' }, '☔' + h.pop + '%')
-                  );
-                })
-              )
-            ),
-            e('div', { style: { marginTop: '20px', minHeight: '135px' } },
-              e('div', { style: { fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', opacity: 0.8 } }, '明日'),
-              e('div', { className: 'hourly-scroll hide-scrollbar' },
-                weather.hourlyTomorrow.map(function(h, i) {
-                  return e('div', { key: i, className: 'hourly-item' },
-                    e('span', { className: 'hourly-time' }, h.time),
-                    e('span', { className: 'hourly-icon' }, h.icon),
-                    e('span', { className: 'hourly-temp' }, h.temp + '°'),
-                    e('span', { className: 'hourly-pop' }, '☔' + h.pop + '%')
-                  );
-                })
-              )
-            )
-          )
-        );
-      }
-
-      return e('div', { className: 'widget-container bg-blue-gradient weather-widget-horizontal' }, content);
-    }
-
-    // 3. Next Transit Widget
-    function NextTransitWidget(props) {
-      var [time, setTime] = useState(new Date());
-      useEffect(function() {
-        var timer = setInterval(function() { setTime(new Date()); }, 10000);
-        return function() { clearInterval(timer); };
-      }, []);
-
-      function getNextDeps() {
-        var nowH = time.getHours();
-        var nowM = time.getMinutes();
-        // Simple mock: every 20-30 mins
-        var deps = [];
-        var nextM = Math.ceil((nowM + 5) / 10) * 10;
-        if (nextM >= 60) { nowH++; nextM = 5; }
-        deps.push({ h: nowH, m: nextM, dest: '小樽行', type: 'jr' });
-        deps.push({ h: nowH, m: (nextM + 15) % 60, dest: '札幌行', type: 'jr' });
-        return deps;
-      }
-
-      var deps = getNextDeps();
-
-      return e('div', { className: 'flex-col gap-4' },
-        e('div', { className: 'widget-container' },
-          e('div', { className: 'widget-title' }, e('span', { className: 'widget-icon' }, '🚆'), 'JR 朝里駅 (次の発車)'),
-          deps.map(function(d, i) {
-            var diff = (d.h * 60 + d.m) - (time.getHours() * 60 + time.getMinutes());
-            if (diff < 0) diff += 1440;
-            return e('div', { key: i, className: 'transit-item' + (i===0 ? ' active' : '') },
-              e('div', null, e('span', { className: 'transit-time' }, d.h + ':' + String(d.m).padStart(2,'0')), e('span', { className: 'transit-dest' }, d.dest)),
-              e('div', { className: 'transit-diff' }, 'あと ' + diff + ' 分')
-            );
-          })
-        ),
-        e('div', { className: 'widget-container' },
-          e('div', { className: 'widget-title' }, e('span', { className: 'widget-icon' }, '🚌'), '中央バス (次の発車)'),
-          e('div', { className: 'transit-item active-orange' },
-            e('div', null, e('span', { className: 'transit-time' }, time.getHours() + ':' + String((time.getMinutes() + 8) % 60).padStart(2,'0')), e('span', { className: 'transit-dest' }, '小樽駅前')),
-            e('div', { className: 'transit-diff' }, 'あと 8 分')
+          e('div', { className: 'grow hide-scrollbar', style: { maxHeight: '160px', overflowY: 'auto' } },
+            e('div', { style: { minHeight: '130px' } }, e('div', {style:{fontSize:'12px',fontWeight:'bold',marginBottom:'4px',color:'#3b82f6'}}, '今日'), e('div', { className: 'hourly-scroll hide-scrollbar' }, w.t.map(function(h,i){ return e('div', {key:i, className:'hourly-item'}, e('span',{className:'hourly-time'},h.time), e('span',{className:'hourly-icon'},h.icon), e('span',{className:'hourly-temp'},h.temp+'°'), e('span',{className:'hourly-pop'},'☔'+h.pop+'%')); }))),
+            e('div', { style: { minHeight: '130px', marginTop: '16px' } }, e('div', {style:{fontSize:'12px',fontWeight:'bold',marginBottom:'4px',color:'#3b82f6'}}, '明日'), e('div', { className: 'hourly-scroll hide-scrollbar' }, w.to.map(function(h,i){ return e('div', {key:i, className:'hourly-item'}, e('span',{className:'hourly-time'},h.time), e('span',{className:'hourly-icon'},h.icon), e('span',{className:'hourly-temp'},h.temp+'°'), e('span',{className:'hourly-pop'},'☔'+h.pop+'%')); })))
           )
         )
       );
     }
 
-    // 3.5 Today TODO Preview
-    function TodayTodoWidget(props) {
-      var all = props.futari.concat(props.beni).concat(props.kou).filter(function(t){ return !t.checked; }).slice(0, 3);
-      return e('div', { className: 'widget-container' },
-        e('div', { className: 'widget-title' }, e('span', { className: 'widget-icon' }, '📝'), '今日のTODO'),
-        all.length === 0 ? e('p', { style: {fontSize:'12px', color:'#94a3b8', textAlign:'center'} }, '完了！') :
-        all.map(function(t, i) {
-          return e('div', { key: i, className: 'todo-item', style: {padding:'6px 0'} },
-            e('div', { className: 'checkbox' }),
-            e('span', { className: 'todo-text', style: {fontSize: '12px'} }, t.text)
-          );
-        })
-      );
-    }
-    // 4. Weekly Calendar Widget (Shift & Garbage)
     function WeeklyCalendarWidget() {
-      var [shiftSchedule, setShiftSchedule] = useState(null);
-      var [garbageSchedule, setGarbageSchedule] = useState(null);
-      var [loading, setLoading] = useState(true);
-      var [selectedDate, setSelectedDate] = useState(null);
-      var [weekOffset, setWeekOffset] = useState(0);
+      var [shift, setShift] = useState(null), [gb, setGb] = useState(null), [ld, setLd] = useState(true);
+      var [sel, setSel] = useState(null), [wo, setWo] = useState(0);
 
-      function getWeekDates(offset) {
-        var today = new Date();
-        var sun = new Date(today);
-        sun.setDate(today.getDate() - today.getDay() + offset * 7);
-        var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-        var dates = [];
-        for (var i = 0; i < 7; i++) {
-          var d = new Date(sun);
-          d.setDate(sun.getDate() + i);
-          var yStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-          dates.push({ dateStr: yStr, displayStr: (d.getMonth() + 1) + '/' + d.getDate(), dayIdx: i, isToday: yStr === todayStr });
-        }
-        return dates;
+      function fetchJsonp(url, cbName) {
+        return new Promise(function(resolve) {
+          window[cbName] = function(res) { resolve(res); delete window[cbName]; };
+          var s = document.createElement('script'); s.src = url; document.body.appendChild(s);
+        });
       }
 
       useEffect(function() {
-        var SHIFT_SHEET_ID = '1wGX8J7vIkjJq5Xdxf8ulUXpFGhvbrHV6';
-        var GARBAGE_SHEET_ID = '1mHHL_1mzgg70Rxu6XhdzsruRAz9UN4MyvP2Dnadiy70';
-        
-        function fetchJsonp(url) {
-          var s = document.createElement('script');
-          s.src = url;
-          document.body.appendChild(s);
-          return s;
-        }
-
-        var cbShift = 'cb_shift_' + Math.floor(Math.random()*1000);
-        window[cbShift] = function(res) {
-          var data = {};
-          res.table.rows.forEach(function(r) {
-            if (r.c[0]) {
-              var d = r.c[0].f || r.c[0].v;
-              var key = String(d).replace(/\//g, '-');
-              data[key] = {
-                M: r.c[2] ? String(r.c[2].v) : '',
-                S: r.c[3] ? String(r.c[3].v) : '',
-                O: r.c[4] ? String(r.c[4].v) : '',
-                C: r.c[5] ? String(r.c[5].v) : ''
-              };
-            }
-          });
-          setShiftSchedule(data);
-          setLoading(false);
-          delete window[cbShift];
-        };
-
-        var cbGarbage = 'cb_garbage_' + Math.floor(Math.random()*1000);
-        window[cbGarbage] = function(res) {
-          var data = {};
-          res.table.rows.forEach(function(r) {
-            if (r.c[0]) {
-              var d = r.c[0].f || r.c[0].v;
-              var key = String(d).split(' ')[0].replace(/\//g, '-');
-              data[key] = r.c[1] ? String(r.c[1].v) : '';
-            }
-          });
-          setGarbageSchedule(data);
-          delete window[cbGarbage];
-        };
-
-        fetchJsonp('https://docs.google.com/spreadsheets/d/' + SHIFT_SHEET_ID + '/gviz/tq?tqx=out:json;responseHandler:' + cbShift);
-        fetchJsonp('https://docs.google.com/spreadsheets/d/' + GARBAGE_SHEET_ID + '/gviz/tq?tqx=out:json;responseHandler:' + cbGarbage);
+        var sUrl = 'https://docs.google.com/spreadsheets/d/1V_8gJb0p2QKKG20xZnluVgyb8bbqqi3D/gviz/tq?tqx=out:json;responseHandler:cbS';
+        var gUrl = 'https://docs.google.com/spreadsheets/d/1mHHL_1mzgg70Rxu6XhdzsruRAz9UN4MyvP2Dnadiy70/gviz/tq?tqx=out:json;responseHandler:cbG';
+        Promise.all([fetchJsonp(sUrl, 'cbS'), fetchJsonp(gUrl, 'cbG')]).then(function(r) {
+          var ds = {}, dg = {};
+          r[0].table.rows.forEach(function(row) { if(row.c[0]) { var k=String(row.c[0].f||row.c[0].v).replace(/\//g,'-'); ds[k]={M:row.c[2]?row.c[2].v:'', S:row.c[3]?row.c[3].v:'', O:row.c[4]?row.c[4].v:'', C:row.c[5]?row.c[5].v:''}; } });
+          r[1].table.rows.forEach(function(row) { if(row.c[0]) { var k=String(row.c[0].f||row.c[0].v).split(' ')[0].replace(/\//g,'-'); dg[k]=row.c[1]?row.c[1].v:''; } });
+          setShift(ds); setGb(dg); setLd(false);
+        }).catch(function(){ setLd(false); });
       }, []);
 
-      var weekDates = getWeekDates(weekOffset);
-      var daysLabels = ['日', '月', '火', '水', '木', '金', '土'];
-      var persons = [{ name: '紅衣', match: '津田' }, { name: '康太', match: '河原' }];
-
-      function getRole(daily, match) {
-        if (!daily) return null;
-        if (daily.M.indexOf(match) !== -1) return { text: 'メイン', color: '#fee2e2', textCol: '#b91c1c' };
-        if (daily.S.indexOf(match) !== -1) return { text: 'サブ', color: '#dbeafe', textCol: '#1d4ed8' };
-        if (daily.O.indexOf(match) !== -1) return { text: 'オペ', color: '#ffedd5', textCol: '#c2410c' };
-        if (daily.C.indexOf(match) !== -1) return { text: 'センター', color: '#f3e8ff', textCol: '#7e22ce' };
+      var wD = []; var td = new Date(); var st = new Date(td); st.setDate(td.getDate() - td.getDay() + wo * 7);
+      var tdStr = td.getFullYear() + '-' + String(td.getMonth()+1).padStart(2,'0') + '-' + String(td.getDate()).padStart(2,'0');
+      for(var i=0; i<7; i++) {
+        var d = new Date(st); d.setDate(st.getDate()+i);
+        var ys = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        wD.push({ ds: ys, dsp: (d.getMonth()+1)+'/'+d.getDate(), didx: i, ist: ys===tdStr });
+      }
+      var lbls = ['日','月','火','水','木','金','土'], ps = [{n:'紅衣',m:'津田'}, {n:'康太',m:'河原'}];
+      function getR(dy, mt) {
+        if(!dy) return null;
+        if(dy.M.indexOf(mt)!==-1) return {t:'メイン', bg:'#fee2e2', c:'#b91c1c'};
+        if(dy.S.indexOf(mt)!==-1) return {t:'サブ', bg:'#dbeafe', c:'#1d4ed8'};
+        if(dy.O.indexOf(mt)!==-1) return {t:'オペ', bg:'#ffedd5', c:'#c2410c'};
+        if(dy.C.indexOf(mt)!==-1) return {t:'センター', bg:'#f3e8ff', c:'#7e22ce'};
         return null;
       }
-
-      function getGStyle(type) {
-        if (!type) return null;
-        if (type.indexOf('可燃') !== -1) return { bg: '#fde047', col: '#713f12' };
-        if (type.indexOf('不燃') !== -1) return { bg: '#3b82f6', col: '#fff' };
-        if (type.indexOf('プラ') !== -1) return { bg: '#4ade80', col: '#064e3b' };
-        return { bg: '#f1f5f9', col: '#64748b' };
+      function getG(t) {
+        if(!t)return null; if(t.indexOf('可燃')!==-1)return {bg:'#fef08a',c:'#713f12'};
+        if(t.indexOf('不燃')!==-1)return {bg:'#93c5fd',c:'#1e3a8a'}; if(t.indexOf('プラ')!==-1)return {bg:'#86efac',c:'#14532d'};
+        return {bg:'#f1f5f9',c:'#64748b'};
       }
 
-      function getWeekLabel(offset) {
-        if (offset === 0) return '今週';
-        if (offset > 0) return offset + '週後';
-        return Math.abs(offset) + '週前';
-      }
-
-      return e('div', { className: 'widget-container', style: { position: 'relative' } },
-        e('div', { className: 'flex justify-between items-center', style: { marginBottom: '12px' } },
-          e('div', { className: 'widget-title', style: { marginBottom: 0 } }, e('span', { className: 'widget-icon' }, '📅'), '週間カレンダー'),
+      return e('div', { className: 'widget-container w-full hide-scrollbar', style: { overflowX: 'auto', padding: '16px 24px' } },
+        e('div', { className: 'flex justify-between items-center', style: { marginBottom: '16px' } },
+          e('div', { className: 'widget-title', style: { margin: 0 } }, e('span', { className: 'widget-icon' }, '📅'), '週間スケジュール'),
           e('div', { className: 'flex gap-2 items-center' },
-            e('button', { className: 'btn-ghost', onClick: function(){ setWeekOffset(weekOffset-1); } }, '‹'),
-            e('span', { style: { fontSize: '11px', fontWeight: '800' } }, getWeekLabel(weekOffset)),
-            e('button', { className: 'btn-ghost', onClick: function(){ setWeekOffset(weekOffset+1); } }, '›'),
-            weekOffset !== 0 && e('button', { className: 'btn-ghost', style: { color: '#3b82f6', fontSize: '10px' }, onClick: function(){ setWeekOffset(0); } }, '今週へ')
+            e('button', { className: 'btn-ghost', onClick: function(){ setWo(wo-1); } }, '‹'),
+            e('span', { style: { fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)' } }, wo===0 ? '今週' : (wo>0 ? wo+'週後' : Math.abs(wo)+'週前')),
+            e('button', { className: 'btn-ghost', onClick: function(){ setWo(wo+1); } }, '›'),
+            wo!==0 && e('button', { className: 'btn-ghost', style: { color: 'var(--primary)', fontSize: '10px' }, onClick: function(){ setWo(0); } }, '今週へ')
           )
         ),
-        loading ? e('div', { className: 'text-center py-4' }, '読み込み中...') :
-        e('div', { style: { overflowX: 'auto' } },
-          e('table', { style: { width: '100%', borderCollapse: 'collapse', minWidth: '700px', tableLayout: 'fixed' } },
-            e('thead', null, e('tr', null,
-              e('th', { style: { width: 'calc(100% / 8)', fontSize: '16px', textAlign: 'left', padding: '18px' } }, '担当'),
-              weekDates.map(function(d) {
-                var dayColor = '';
-                if (d.dayIdx === 0) dayColor = '#ef4444'; // 日曜
-                else if (d.dayIdx === 6) dayColor = '#3b82f6'; // 土曜
-                
-                return e('th', { 
-                  key: d.dateStr, 
-                  style: { padding: '18px', cursor: 'pointer', background: d.isToday ? '#fef9c3' : '', width: 'calc(100% / 8)' },
-                  onClick: function() { setSelectedDate(d.dateStr); }
-                },
-                  e('div', { style: { fontSize: '22px', color: dayColor } }, d.displayStr),
-                  e('div', { style: { fontSize: '18px', opacity: 0.5, color: dayColor } }, daysLabels[d.dayIdx])
-                );
-              })
-            )),
-            e('tbody', null, 
-              persons.map(function(p) {
-                return e('tr', { key: p.name },
-                  e('td', { style: { fontSize: '20px', fontWeight: '800', padding: '18px' } }, p.name),
-                  weekDates.map(function(d) {
-                    var role = getRole(shiftSchedule && shiftSchedule[d.dateStr], p.match);
-                    return e('td', { key: d.dateStr, style: { textAlign: 'center', padding: '12px', background: d.isToday ? '#fefce8' : '' } },
-                      role ? e('div', { style: { background: role.color, color: role.textCol, fontSize: '18px', fontWeight: '900', padding: '10px 8px', borderRadius: '10px' } }, role.text) : '-'
-                    );
-                  })
-                );
-              }),
-              e('tr', null,
-                e('td', { style: { fontSize: '20px', fontWeight: '800', padding: '18px', color: '#059669' } }, '♻️ ごみ'),
-                weekDates.map(function(d) {
-                  var g = garbageSchedule && garbageSchedule[d.dateStr];
-                  var style = getGStyle(g);
-                  return e('td', { key: d.dateStr, style: { textAlign: 'center', padding: '12px', background: d.isToday ? '#fefce8' : '' } },
-                    g ? e('div', { style: { background: style.bg, color: style.col, fontSize: '18px', fontWeight: '900', padding: '10px 8px', borderRadius: '10px' } }, g) : '-'
-                  );
-                })
-              )
-            )
+        ld ? e('div', {className:'text-center'}, '取得中...') :
+        e('table', { className: 'cal-table' },
+          e('thead', null, e('tr', null, e('th', { style: { width: '80px', color: 'var(--text-muted)' } }, '担当'), wD.map(function(d) {
+            var col = d.didx===0 ? 'var(--red)' : (d.didx===6 ? 'var(--blue)' : 'var(--text)');
+            return e('th', { key: d.ds, style: { background: d.ist ? '#fef9c3' : '' }, onClick: function(){ setSel(d.ds); } }, e('div', { style: { fontSize: '20px', color:col } }, d.dsp), e('div', { style: { fontSize: '14px', opacity: 0.6, color:col } }, lbls[d.didx]));
+          }))),
+          e('tbody', null, 
+            ps.map(function(p){ return e('tr', { key: p.n }, e('td', { style: { fontWeight: '800', fontSize: '18px' } }, p.n), wD.map(function(d){ var r = getR(shift&&shift[d.ds], p.m); return e('td', { key: d.ds, style: { background: d.ist ? '#fefce8' : '' }, onClick: function(){ setSel(d.ds); } }, r ? e('div', { style: { background: r.bg, color: r.c, padding: '8px 0', borderRadius: '8px', fontWeight: 'bold' } }, r.t) : '-'); })); }),
+            e('tr', null, e('td', { style: { fontWeight: '800', fontSize: '16px', color: 'var(--accent)' } }, '♻️ ゴミ'), wD.map(function(d){ var g = getG(gb&&gb[d.ds]); return e('td', { key: d.ds, style: { background: d.ist ? '#fefce8' : '' }, onClick: function(){ setSel(d.ds); } }, g ? e('div', { style: { background: g.bg, color: g.c, padding: '8px 0', borderRadius: '8px', fontWeight: 'bold', fontSize:'13px' } }, gb&&gb[d.ds]) : '-'); }))
           )
         ),
-        selectedDate && e('div', { 
-            style: { 
-              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-              background: 'rgba(0,0,0,0.4)', zIndex: 2000, display: 'flex', 
-              alignItems: 'center', justifyContent: 'center', padding: '20px'
-            },
-            onClick: function(){ setSelectedDate(null); }
-          },
-          e('div', { 
-              style: { 
-                background: 'white', width: '100%', maxWidth: '300px', 
-                borderRadius: '24px', padding: '24px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
-                position: 'relative'
-              },
-              onClick: function(ev){ ev.stopPropagation(); }
-            },
+        sel && e('div', { className: 'modal-overlay', onClick: function(){ setSel(null); } },
+          e('div', { className: 'modal-content', onClick: function(ev){ev.stopPropagation();} },
             e('div', { className: 'flex justify-between items-center', style: { marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '12px' } },
-              e('h3', { style: { margin: 0, fontSize: '18px', fontWeight: '900' } }, selectedDate.slice(5).replace('-','/') + ' の詳細'),
-              e('button', { className: 'btn-ghost', style: {fontSize:'20px'}, onClick: function(){ setSelectedDate(null); } }, '✕')
+              e('h3', { style: { margin: 0, fontSize: '18px', fontWeight: '900' } }, sel.slice(5).replace('-','/') + ' の詳細'), e('button', { className: 'btn-ghost', style: {fontSize:'20px'}, onClick: function(){ setSel(null); } }, '✕')
             ),
             (function() {
-              var d = shiftSchedule && shiftSchedule[selectedDate];
-              var g = garbageSchedule && garbageSchedule[selectedDate];
+              var s = shift&&shift[sel], g = gb&&gb[sel];
               return e('div', { className: 'flex-col gap-4' },
-                e('div', { className: 'flex justify-between items-center' }, e('span', { style: { background: '#fee2e2', color: '#b91c1c', padding: '6px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', width: '85px', textAlign: 'center' } }, 'メイン'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, (d && d.M) || '-')),
-                e('div', { className: 'flex justify-between items-center' }, e('span', { style: { background: '#dbeafe', color: '#1d4ed8', padding: '6px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', width: '85px', textAlign: 'center' } }, 'サブ'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, (d && d.S) || '-')),
-                e('div', { className: 'flex justify-between items-center' }, e('span', { style: { background: '#ffedd5', color: '#c2410c', padding: '6px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', width: '85px', textAlign: 'center' } }, 'オペ'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, (d && d.O) || '-')),
-                e('div', { className: 'flex justify-between items-center' }, e('span', { style: { background: '#f3e8ff', color: '#7e22ce', padding: '6px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', width: '85px', textAlign: 'center' } }, 'センター'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, (d && d.C) || '-')),
-                g && e('div', { className: 'flex justify-between items-center', style: { marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f1f5f9' } }, e('span', { style: { background: '#dcfce7', color: '#166534', padding: '6px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', width: '85px', textAlign: 'center' } }, 'ごみ'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, g))
+                e('div', { className: 'flex justify-between items-center' }, e('span', { style: { background: '#fee2e2', color: '#b91c1c', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', width: '80px', textAlign: 'center' } }, 'メイン'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, (s&&s.M)||'-')),
+                e('div', { className: 'flex justify-between items-center' }, e('span', { style: { background: '#dbeafe', color: '#1d4ed8', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', width: '80px', textAlign: 'center' } }, 'サブ'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, (s&&s.S)||'-')),
+                e('div', { className: 'flex justify-between items-center' }, e('span', { style: { background: '#ffedd5', color: '#c2410c', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', width: '80px', textAlign: 'center' } }, 'オペ'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, (s&&s.O)||'-')),
+                e('div', { className: 'flex justify-between items-center' }, e('span', { style: { background: '#f3e8ff', color: '#7e22ce', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', width: '80px', textAlign: 'center' } }, 'センター'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, (s&&s.C)||'-')),
+                g && e('div', { className: 'flex justify-between items-center', style: { marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' } }, e('span', { style: { background: '#dcfce7', color: '#166534', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', width: '80px', textAlign: 'center' } }, 'ゴミ'), e('span', { style: { fontWeight: 'bold', fontSize: '15px' } }, g))
               );
             })()
           )
@@ -669,400 +296,306 @@
       );
     }
 
-    // 5. Shopping List Tab
-    function ShoppingListTab() {
-      var [categories, setCategories] = useState(['全般']);
-      var [activeCategory, setActiveCategory] = useState('全般');
-      var [items, setItems] = useState([
-        { id: 1, name: '牛乳', qty: '1', checked: false, category: '全般' }
-      ]);
-      var [input, setInput] = useState('');
-      var [showAddCat, setShowAddCat] = useState(false);
-      var [newCatName, setNewCatName] = useState('');
-      var [catDate, setCatDate] = useState(new Date().toISOString().split('T')[0]);
-      var [contextMenu, setContextMenu] = useState(null); // { x, y, item }
-
-      function addItem() {
-        if (!input.trim()) return;
-        setItems(items.concat([{ 
-          id: Date.now(), 
-          name: input, 
-          qty: '1', 
-          checked: false, 
-          category: activeCategory 
-        }]));
-        setInput('');
-      }
-
-      function addCategory() {
-        if (!newCatName.trim() || categories.indexOf(newCatName) !== -1) return;
-        setCategories(categories.concat([newCatName]));
-        setActiveCategory(newCatName);
-        setNewCatName('');
-        setShowAddCat(false);
-      }
-
-      function addDateCategory() {
-        var dateStr = catDate.replace(/-/g, '/');
-        if (categories.indexOf(dateStr) !== -1) return setActiveCategory(dateStr);
-        setCategories(categories.concat([dateStr]));
-        setActiveCategory(dateStr);
-        setShowAddCat(false);
-      }
-
-      function copyItem(item, targetCat) {
-        setItems(items.concat([Object.assign({}, item, { id: Date.now() + Math.random(), category: targetCat, checked: false })]));
-        setContextMenu(null);
-      }
-
-      var filtered = items.filter(function(i) { return i.category === activeCategory; });
-
-      var touchTimer;
-      function handleTouchStart(e, item) {
-        var touch = e.touches[0];
-        var x = touch.clientX;
-        var y = touch.clientY;
-        touchTimer = setTimeout(function() {
-          setContextMenu({ x: x, y: y, item: item });
-        }, 600);
-      }
-      function handleTouchEnd() { clearTimeout(touchTimer); }
-
-      return e('div', { 
-          className: 'container', 
-          style: { padding: '24px', paddingBottom: '120px' },
-          onClick: function() { if(contextMenu) setContextMenu(null); }
-        },
-        e('div', { className: 'flex justify-between items-center', style: { marginBottom: '20px' } },
-          e('h2', { className: 'logo', style: { margin: 0 } }, '🛒 お買物'),
-          e('div', { className: 'flex gap-2' },
-            e('select', { 
-              className: 'select-field', 
-              value: activeCategory, 
-              onChange: function(e){ setActiveCategory(e.target.value); } 
-            }, 
-              categories.map(function(c){ return e('option', { key: c, value: c }, c); })
-            ),
-            e('button', { className: 'btn-ghost', style: { fontSize: '20px', padding: '0 8px' }, onClick: function(){ setShowAddCat(!showAddCat); } }, '＋')
-          )
-        ),
-
-        showAddCat && e('div', { className: 'widget-container', style: { marginBottom: '20px', background: '#f0fdf4' } },
-          e('div', { className: 'flex-col gap-3' },
+    function ShoppingTab() {
+      var [cats, setCats] = useState(['全般']), [ac, setAc] = useState('全般'), [items, setItems] = useState([]), [txt, setTxt] = useState(''), [qty, setQty] = useState('');
+      var [showAd, setShowAd] = useState(false), [nCat, setNCat] = useState(''), [cDt, setCDt] = useState(new Date().toISOString().split('T')[0]);
+      var [ctx, setCtx] = useState(null), [st, setSt] = useState('ホクレン');
+      var fl = {'ホクレン':'https://tokubai.co.jp/%E3%83%9B%E3%82%AF%E3%83%AC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%97','トライアル':'https://tokubai.co.jp/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%88%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%AB','サツドラ':'https://tokubai.co.jp/%E3%82%B5%E3%83%84%E3%83%89%E3%83%A9'};
+      
+      useEffect(function(){ apiService.fetchJsonp('getShopping').then(function(r){ if(r&&r.length){ setItems(r); var c=r.map(function(i){return i.category;}).filter(function(v,i,a){return a.indexOf(v)===i;}); if(c.indexOf('全般')===-1)c.unshift('全般'); setCats(c); } }); }, []);
+      function save(it) { setItems(it); apiService.fetchJsonp('saveShopping', it); }
+      function add() { if(!txt.trim())return; save(items.concat([{id:Date.now(), name:txt, qty:qty||'1', checked:false, category:ac}])); setTxt(''); setQty(''); }
+      function addC() { if(!nCat.trim()||cats.indexOf(nCat)!==-1)return; setCats(cats.concat([nCat])); setAc(nCat); setNCat(''); setShowAd(false); }
+      function onDt(val) { if(!val)return; var d=new Date(val.replace(/-/g,'/')); setNCat(d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()); }
+      function cpy(it, tgt) { save(items.concat([Object.assign({}, it, {id:Date.now()+Math.random(), category:tgt, checked:false})])); setCtx(null); }
+      
+      var tmr; function tStart(e, it) { var t=e.touches[0]; tmr=setTimeout(function(){ setCtx({x:t.clientX, y:t.clientY, it:it}); }, 600); } function tEnd(){ clearTimeout(tmr); }
+      
+      return e('div', { className: 'container', style: { padding: '24px', display: 'flex', gap: '24px', height: '100%', paddingBottom: '100px', flexWrap: 'wrap' }, onClick: function(){ if(ctx)setCtx(null); } },
+        e('div', { className: 'widget-container', style: { flex: '1 1 350px' } },
+          e('div', { className: 'flex justify-between items-center', style: { marginBottom: '16px' } },
+            e('h2', { className: 'widget-title', style: { margin: 0 } }, e('span', { className: 'widget-icon' }, '🛒'), 'リスト'),
             e('div', { className: 'flex gap-2' },
-              e('input', { className: 'input-field', style: {fontSize:'13px'}, placeholder: '新カテゴリ名...', value: newCatName, onChange: function(e){ setNewCatName(e.target.value); } }),
-              e('button', { className: 'btn-blue', style: {background:'#10b981', padding:'8px 16px'}, onClick: addCategory }, '作成')
-            ),
-            e('div', { className: 'flex items-center gap-2', style: { borderTop: '1px solid #dcfce7', paddingTop: '10px' } },
-              e('input', { type: 'date', className: 'input-field', style: {fontSize:'13px', flex:1}, value: catDate, onChange: function(e){ setCatDate(e.target.value); } }),
-              e('button', { className: 'btn-ghost', style: {fontSize:'11px', color:'#059669', fontWeight:'bold'}, onClick: addDateCategory }, '📅 日付で作成')
+              e('select', { className: 'select-field', value: ac, onChange: function(e){ setAc(e.target.value); } }, cats.map(function(c){return e('option',{key:c,value:c},c);})),
+              e('button', { className: 'btn-ghost', style: { padding: '4px 12px', fontSize: '18px' }, onClick: function(){ setShowAd(!showAd); } }, '＋')
             )
-          )
-        ),
-
-        e('div', { className: 'widget-container' },
-          e('div', { className: 'todo-input-group' },
-            e('input', { className: 'todo-input', placeholder: activeCategory + ' に追加...', value: input, onChange: function(e){ setInput(e.target.value); } }),
-            e('button', { className: 'btn-add', style: { background: '#10b981' }, onClick: addItem }, '＋')
           ),
-          e('div', null, filtered.map(function(item) {
-            return e('div', { 
-                key: item.id, 
-                className: 'todo-item',
-                onContextMenu: function(e) {
-                  e.preventDefault();
-                  setContextMenu({ x: e.clientX, y: e.clientY, item: item });
-                },
-                onTouchStart: function(e) { handleTouchStart(e, item); },
-                onTouchEnd: handleTouchEnd
-              },
-              e('div', { 
-                className: 'checkbox' + (item.checked ? ' checked' : ''), 
-                style: { borderColor: '#10b981', background: item.checked ? '#10b981' : '' },
-                onClick: function() { 
-                  setItems(items.map(function(i){ return i.id===item.id ? Object.assign({}, i, {checked: !i.checked}) : i; }));
-                } 
-              }),
-              e('span', { className: 'todo-text' + (item.checked ? ' checked' : ''), style: {flex:1} }, item.name),
-              e('button', { className: 'btn-ghost', onClick: function(){ setItems(items.filter(function(i){ return i.id!==item.id; })); } }, '✕')
-            );
-          })),
-          e('p', { style: { fontSize: '9px', textAlign: 'center', color: '#94a3b8', marginTop: '10px', fontStyle: 'italic' } }, '右クリック/長押しで他カテゴリへコピー')
-        ),
-
-        contextMenu && e('div', { 
-            style: { 
-              position: 'fixed', top: contextMenu.y, left: Math.min(contextMenu.x, window.innerWidth - 160), 
-              background: 'white', border: '1px solid #eee', borderRadius: '12px', 
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 2000, width: '150px', padding: '8px 0' 
-            } 
-          },
-          e('p', { style: { fontSize: '9px', fontWeight: 'bold', color: '#94a3b8', padding: '4px 12px', margin: 0 } }, 'コピー先を選んでください'),
-          categories.filter(function(c){ return c !== contextMenu.item.category; }).map(function(c) {
-            return e('button', { 
-              key: c, 
-              className: 'btn-ghost', 
-              style: { width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: '13px', borderRadius: 0 },
-              onClick: function() { copyItem(contextMenu.item, c); }
-            }, '📋 ' + c + ' へコピー');
-          })
-        )
-      );
-    }
-
-    // 6. Timetables Tab
-    function TimetablesTab() {
-      var jrUrl = "https://jrhokkaidonorikae.com/ekihatsu/ekihatsu.php?node=%E6%9C%9D%E9%87%8C&linename=%EF%BC%AA%EF%BC%B2%E5%87%BD%E9%A4%A8%E6%9C%AC%E7%B7%9A&directionname=%E6%B1%9F%E5%88%A5%E3%83%BB%E5%B2%A9%E8%A6%8B%E6%B2%A2&next_node_id=4204&directionname2=%E5%B0%8F%E6%A8%BD%E3%83%BB%E5%80%B6%E7%9F%A5%E5%AE%89%7C4202";
-      var busUrl = "https://transfer.navitime.biz/chuo-bus/pc/diagram/BusCourseSearch?busstopId=00300196";
-      
-      return e('div', { className: 'container', style: { padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' } },
-        e('div', { className: 'widget-container', style: { height: '800px', padding: 0 } },
-          e('div', { style: { padding: '15px', fontWeight: 'bold', borderBottom: '1px solid #eee' } }, '🚆 JR時刻表'),
-          e('iframe', { src: jrUrl, style: { width: '100%', height: 'calc(100% - 50px)', border: 'none' } })
-        ),
-        e('div', { className: 'widget-container', style: { height: '800px', padding: 0 } },
-          e('div', { style: { padding: '15px', fontWeight: 'bold', borderBottom: '1px solid #eee' } }, '🚌 バス時刻表'),
-          e('iframe', { src: busUrl, style: { width: '100%', height: 'calc(100% - 50px)', border: 'none' } })
-        )
-      );
-    }
-
-    // 7. Calendar Tab
-    function CalendarTab() {
-      return e('div', { className: 'container', style: { padding: '24px', height: '100%' } },
-        e('div', { className: 'widget-container', style: { height: '800px', padding: 0 } },
-          e('div', { style: { padding: '15px', fontWeight: 'bold' } }, '📅 TimeTree'),
-          e('iframe', { src: "https://timetreeapp.com/", style: { width: '100%', height: 'calc(100% - 50px)', border: 'none' } })
-        )
-      );
-    }
-
-    // 4. TODO Tab Component
-    function TodoColumn(props) {
-      var [text, setText] = useState('');
-      var handleAdd = function() {
-        if (!text.trim()) return;
-        props.setTodos(props.todos.concat([{ id: Date.now(), text: text, checked: false }]));
-        setText('');
-      };
-      
-      return e('div', { className: 'widget-container todo-col' },
-        e('div', { className: 'widget-title text-center justify-center' }, props.title),
-        e('div', { className: 'todo-input-group' },
-          e('input', { 
-            className: 'todo-input', placeholder: '追加...', value: text, 
-            onChange: function(e) { setText(e.target.value); },
-            onKeyDown: function(e) { if(e.key==='Enter') handleAdd(); }
-          }),
-          e('button', { className: 'btn-add', onClick: handleAdd }, '＋')
-        ),
-        e('div', { className: 'grow scroll-area hide-scrollbar', style: { position: 'static', maxHeight: '400px' } },
-          props.todos.map(function(item) {
-            return e('div', { key: item.id, className: 'todo-item' },
-              e('div', { 
-                className: 'checkbox' + (item.checked ? ' checked' : ''),
-                onClick: function() { 
-                  props.setTodos(props.todos.map(function(t){ return t.id === item.id ? Object.assign({}, t, {checked: !t.checked}) : t; }));
-                }
-              }),
-              e('span', { className: 'todo-text' + (item.checked ? ' checked' : '') }, item.text),
-              e('button', { 
-                className: 'btn-ghost', style: { color: '#f87171' },
-                onClick: function() { props.setTodos(props.todos.filter(function(t){ return t.id !== item.id; })); }
-              }, '✕')
-            );
-          })
-        )
-      );
-    }
-
-    // 5. Document Management Tab
-    function DocumentTab() {
-      var SHEET_ID = '1fcmLO_2BixAdYuvncMosPQQLFavArXUgIW101fMIiSA';
-      var GAS_URL = 'https://script.google.com/macros/s/AKfycbwub82-0Q6Ng7aRblX1RYdWmEP3ALKEXpXQKOjNCl0ddhZxjmnLqMm5_VPSl2VUMzk/exec';
-      
-      var [docs, setDocs] = useState([]);
-      var [loading, setLoading] = useState(true);
-      var [view, setView] = useState('list'); // 'list', 'input'
-      var [formData, setFormData] = useState({ No: '', 書類名: '', カテゴリ: 'その他', 保証期限: '', メモ: '' });
-      var [status, setStatus] = useState('');
-
-      var fetchData = function() {
-        setLoading(true);
-        var cb = 'cb' + Date.now();
-        window[cb] = function(res) {
-          var data = res.table.rows.map(function(r) {
-            return {
-              No: r.c[0] ? r.c[0].v : '',
-              書類名: r.c[1] ? r.c[1].v : '',
-              登録日: r.c[2] ? (r.c[2].f || r.c[2].v) : '',
-              カテゴリ: r.c[3] ? r.c[3].v : '',
-              保証期限: r.c[4] ? (r.c[4].f || r.c[4].v) : '',
-              メモ: r.c[5] ? r.c[5].v : ''
-            };
-          }).sort(function(a,b){ return b.No - a.No; });
-          setDocs(data);
-          setLoading(false);
-          delete window[cb];
-        };
-        var s = document.createElement('script');
-        s.src = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json;responseHandler:' + cb;
-        document.body.appendChild(s);
-      };
-
-      useEffect(fetchData, []);
-
-      var handleSave = function() {
-        if (!formData.No || !formData.書類名) return alert('Noと書類名は必須です');
-        if (!confirm('保存しますか？')) return;
-        
-        setStatus('送信中...');
-        var payload = { action: view === 'edit' ? 'update' : 'add', data: formData };
-        if (view === 'input') payload.data.登録日 = new Date().toLocaleDateString('ja-JP');
-
-        fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-          .then(function() {
-             setStatus('完了しました。反映までお待ちください。');
-             setTimeout(function(){ setStatus(''); setView('list'); fetchData(); }, 2000);
-          })
-          .catch(function(){ setStatus('エラーが発生しました'); });
-      };
-
-      if (view === 'input' || view === 'edit') {
-        return e('div', { className: 'container', style: { padding: '24px' } },
-          e('div', { className: 'widget-container', style: { maxWidth: '500px', margin: '0 auto' } },
-            e('h2', { className: 'widget-title' }, view === 'edit' ? '修正' : '新規登録'),
-            e('div', { className: 'flex-col gap-4' },
-              e('div', null, e('label', { style: {fontSize:'12px', fontWeight:'800'} }, 'No'), e('input', { className: 'input-field', value: formData.No, disabled: view==='edit', onChange: function(e){ setFormData(Object.assign({}, formData, {No: e.target.value})); } })),
-              e('div', null, e('label', { style: {fontSize:'12px', fontWeight:'800'} }, '書類名'), e('input', { className: 'input-field', value: formData.書類名, onChange: function(e){ setFormData(Object.assign({}, formData, {書類名: e.target.value})); } })),
-              e('div', null, e('label', { style: {fontSize:'12px', fontWeight:'800'} }, 'カテゴリ'), e('select', { className: 'input-field', value: formData.カテゴリ, onChange: function(e){ setFormData(Object.assign({}, formData, {カテゴリ: e.target.value})); } }, 
-                e('option', { value: '保証書' }, '保証書'), e('option', { value: '契約書' }, '契約書'), e('option', { value: '医療' }, '医療'), e('option', { value: 'その他' }, 'その他')
-              )),
-              e('div', null, e('label', { style: {fontSize:'12px', fontWeight:'800'} }, 'メモ'), e('textarea', { className: 'input-field', rows: 3, value: formData.メモ, onChange: function(e){ setFormData(Object.assign({}, formData, {メモ: e.target.value})); } })),
-              e('div', { className: 'flex gap-2', style: {marginTop:'10px'} },
-                e('button', { className: 'btn-blue', style: {flex: 1}, onClick: handleSave }, '保存'),
-                e('button', { className: 'btn-ghost', style: {flex: 1}, onClick: function(){ setView('list'); } }, 'キャンセル')
-              ),
-              status && e('div', { style: { textAlign: 'center', marginTop: '10px', color: '#2563eb', fontWeight: 'bold' } }, status)
+          showAd && e('div', { style: { background: '#f0fdf4', padding: '12px', borderRadius: '12px', marginBottom: '16px', border: '1px solid #dcfce7' } },
+            e('div', { className: 'flex gap-2' }, 
+              e('input', { className: 'input-field', style: {fontSize:'13px', padding:'8px 12px', flex:1}, placeholder: '新しいカテゴリ名...', value: nCat, onChange: function(e){setNCat(e.target.value);} }), 
+              e('input', { type: 'date', className: 'input-field', style: {fontSize:'11px', padding:'4px', width:'40px'}, onChange: function(e){onDt(e.target.value);} }), 
+              e('button', { className: 'btn-blue', style: {background:'#10b981', padding:'8px 16px'}, onClick: addC }, '追加')
             )
+          ),
+          e('div', { className: 'todo-input-group' }, 
+            e('input', { className: 'todo-input', style: { flex: 4, minWidth: 0 }, placeholder: ac+' に追加...', value: txt, onChange: function(e){setTxt(e.target.value);}, onKeyDown: function(e){if(e.key==='Enter')add();} }), 
+            e('input', { className: 'todo-input', style: { flex: 1, minWidth: 0, borderLeft: '1px solid var(--border)', textAlign: 'center', fontSize: '12px' }, placeholder: '数量', value: qty, onChange: function(e){setQty(e.target.value);}, onKeyDown: function(e){if(e.key==='Enter')add();} }),
+            e('button', { className: 'btn-add', onClick: add }, '＋')
+          ),
+          e('div', { className: 'scroll-area hide-scrollbar', style: { position: 'relative', flex: 1, marginTop: '8px' } }, items.filter(function(i){return i.category===ac;}).map(function(it) {
+            return e('div', { key: it.id, className: 'todo-item', onContextMenu: function(e){e.preventDefault(); setCtx({x:e.clientX, y:e.clientY, it:it});}, onTouchStart: function(e){tStart(e,it);}, onTouchEnd: tEnd },
+              e('div', { className: 'checkbox'+(it.checked?' checked':''), onClick: function(){ save(items.map(function(i){return i.id===it.id?Object.assign({},i,{checked:!i.checked}):i;})); } }),
+              e('span', { className: 'todo-text'+(it.checked?' checked':'') }, 
+                it.name, 
+                it.qty && e('span', { style: { fontSize: '11px', fontWeight: '800', color: 'var(--primary)', marginLeft: '12px', background: 'rgba(59, 130, 246, 0.08)', padding: '2px 8px', borderRadius: '6px' } }, it.qty)
+              ),
+              e('button', { className: 'btn-ghost', style: {color:'var(--red)'}, onClick: function(){ save(items.filter(function(i){return i.id!==it.id;})); } }, '✕')
+            );
+          }), e('p', {style:{fontSize:'10px', color:'var(--text-muted)', textAlign:'center', marginTop:'16px'}}, '右クリック/長押しで別カテゴリへコピー'))
+        ),
+        e('div', { className: 'widget-container', style: { flex: '2 1 450px', padding: 16 } },
+          e('div', { className: 'flex gap-2 hide-scrollbar', style: { overflowX: 'auto', marginBottom: '16px' } }, Object.keys(fl).map(function(s){ return e('button', { key: s, className: 'header-nav-btn'+(st===s?' active':''), onClick: function(){setSt(s);} }, s); })),
+          e('iframe', { src: fl[st], style: { width: '100%', height: '100%', border: '1px solid #e2e8f0', borderRadius: '12px' } })
+        ),
+        ctx && e('div', { style: { position: 'fixed', top: ctx.y, left: Math.min(ctx.x, window.innerWidth-160), background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: 'var(--shadow-hover)', zIndex: 2000, width: '150px', padding: '8px 0' } },
+          e('p', { style: { fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', padding: '4px 12px', margin: 0 } }, 'コピー先:'),
+          cats.filter(function(c){return c!==ctx.it.category;}).map(function(c){ return e('button', { key: c, className: 'btn-ghost', style: {width:'100%', textAlign:'left', padding:'8px 12px', borderRadius:0}, onClick: function(){cpy(ctx.it, c);} }, '📋 ' + c); })
+        )
+      );
+    }
+
+    function TodoCol(props) {
+      var [txt, setTxt] = useState('');
+      function a() { 
+        if(!txt.trim())return; 
+        var newItem = {id:Date.now(), text:txt, checked:false, owner:props.owner};
+        props.onSave(props.allTodos.concat([newItem]));
+        setTxt(''); 
+      }
+      return e('div', { className: 'widget-container', style: { flex: '1 1 300px' } },
+        e('div', { className: 'widget-title text-center justify-center' }, props.title),
+        e('div', { className: 'todo-input-group' }, e('input', { className: 'todo-input', placeholder: '追加...', value: txt, onChange: function(e){setTxt(e.target.value);}, onKeyDown: function(e){if(e.key==='Enter')a();} }), e('button', { className: 'btn-add', style: {background:'var(--blue)'}, onClick: a }, '＋')),
+        e('div', { className: 'grow scroll-area hide-scrollbar', style: { position: 'static', maxHeight: '400px' } }, props.todos.map(function(it){ 
+          return e('div', { key: it.id, className: 'todo-item' }, 
+            e('div', { className: 'checkbox'+(it.checked?' checked':''), onClick: function(){
+              props.onSave(props.allTodos.map(function(t){return t.id===it.id?Object.assign({},t,{checked:!t.checked}):t;}));
+            } }), 
+            e('span', { className: 'todo-text'+(it.checked?' checked':'') }, it.text), 
+            e('button', { className: 'btn-ghost', style: {color:'var(--red)'}, onClick: function(){
+              props.onSave(props.allTodos.filter(function(t){return t.id!==it.id;}));
+            } }, '✕')
+          ); 
+        }))
+      );
+    }
+
+    function TodoTab() {
+      var [all, setAll] = useState([]), [ld, setLd] = useState(true);
+      useEffect(function(){ fetchT(); }, []);
+      function fetchT() { setLd(true); apiService.fetchJsonp('getTodo').then(function(r){ if(r&&r.length) setAll(r); setLd(false); }).catch(function(){setLd(false);}); }
+      function saveT(list) { setAll(list); apiService.fetchJsonp('saveTodo', list); }
+
+      var tf = all.filter(function(t){return t.owner==='ふたり';});
+      var tb = all.filter(function(t){return t.owner==='紅';});
+      var tk = all.filter(function(t){return t.owner==='康';});
+
+      if(ld) return e('div', {className:'text-center py-20'}, 'TODO取得中...');
+
+      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', gap: '24px', paddingBottom: '100px' } }, 
+        e(TodoCol, {title:'ふたり', owner:'ふたり', todos:tf, allTodos:all, onSave:saveT}), 
+        e(TodoCol, {title:'紅', owner:'紅', todos:tb, allTodos:all, onSave:saveT}), 
+        e(TodoCol, {title:'康', owner:'康', todos:tk, allTodos:all, onSave:saveT})
+      );
+    }
+
+    function DocumentTab() {
+      var SID = '1fcmLO_2BixAdYuvncMosPQQLFavArXUgIW101fMIiSA', GURL = 'https://script.google.com/macros/s/AKfycbwub82-0Q6Ng7aRblX1RYdWmEP3ALKEXpXQKOjNCl0ddhZxjmnLqMm5_VPSl2VUMzk/exec';
+      var [ds, setDs] = useState([]), [ld, setLd] = useState(true), [vw, setVw] = useState('list'), [frm, setFrm] = useState({No:'',書類名:'',カテゴリ:'その他',保証期限:'',メモ:''}), [st, setSt] = useState('');
+      function fetchD() { setLd(true); var cb='cbd'+Date.now(); window[cb]=function(r){ var data=r.table.rows.map(function(row){return{No:row.c[0]?row.c[0].v:'', 書類名:row.c[1]?row.c[1].v:'', 登録日:row.c[2]?(row.c[2].f||row.c[2].v):'', カテゴリ:row.c[3]?row.c[3].v:'', 保証期限:row.c[4]?(row.c[4].f||row.c[4].v):'', メモ:row.c[5]?row.c[5].v:''};}).sort(function(a,b){return b.No-a.No;}); setDs(data); setLd(false); delete window[cb]; }; var s=document.createElement('script'); s.src='https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=out:json;responseHandler:'+cb; document.body.appendChild(s); }
+      useEffect(fetchD, []);
+      function save() { if(!frm.No||!frm.書類名)return alert('Noと書類名は必須'); if(!confirm('保存しますか？'))return; setSt('送信中...'); var p={action:vw==='edit'?'update':'add', data:frm}; if(vw==='input')p.data.登録日=new Date().toLocaleDateString('ja-JP'); fetch(GURL, {method:'POST', mode:'no-cors', body:JSON.stringify(p)}).then(function(){setSt('完了。反映まで待機..'); setTimeout(function(){setSt(''); setVw('list'); fetchD();}, 2000);}).catch(function(){setSt('エラー');}); }
+      
+      if(vw==='input'||vw==='edit') return e('div', { className: 'container', style: { padding: '24px' } }, e('div', { className: 'widget-container', style: { maxWidth: '500px', margin: '0 auto' } }, e('h2', { className: 'widget-title' }, vw==='edit'?'修正':'新規登録'), e('div', { className: 'flex-col gap-4' }, e('div', null, e('label', {style:{fontSize:'12px',fontWeight:'800'}}, 'No'), e('input', { className: 'input-field', value: frm.No, disabled: vw==='edit', onChange: function(e){setFrm(Object.assign({},frm,{No:e.target.value}));} })), e('div', null, e('label', {style:{fontSize:'12px',fontWeight:'800'}}, '書類名'), e('input', { className: 'input-field', value: frm.書類名, onChange: function(e){setFrm(Object.assign({},frm,{書類名:e.target.value}));} })), e('div', null, e('label', {style:{fontSize:'12px',fontWeight:'800'}}, 'カテゴリ'), e('select', { className: 'input-field', value: frm.カテゴリ, onChange: function(e){setFrm(Object.assign({},frm,{カテゴリ:e.target.value}));} }, e('option', {value:'保証書'}, '保証書'), e('option', {value:'契約書'}, '契約書'), e('option', {value:'医療'}, '医療'), e('option', {value:'その他'}, 'その他'))), e('div', null, e('label', {style:{fontSize:'12px',fontWeight:'800'}}, 'メモ'), e('textarea', { className: 'input-field', rows: 3, value: frm.メモ, onChange: function(e){setFrm(Object.assign({},frm,{メモ:e.target.value}));} })), e('div', { className: 'flex gap-2', style: {marginTop:'10px'} }, e('button', { className: 'btn-blue', style: {flex:1}, onClick: save }, '保存'), e('button', { className: 'btn-ghost', style: {flex:1, background:'var(--bg-panel-hover)'}, onClick: function(){setVw('list');} }, 'キャンセル')), st && e('div', { style: { textAlign: 'center', marginTop: '10px', color: 'var(--primary)', fontWeight: 'bold' } }, st))));
+      
+      return e('div', { className: 'container', style: { padding: '24px', paddingBottom: '100px' } }, e('div', { className: 'flex justify-between items-center', style: { marginBottom: '24px' } }, e('h2', { className: 'widget-title', style: {margin:0} }, e('span', {className:'widget-icon'}, '📄'), '文書管理'), e('div', { className: 'flex gap-2' }, e('button', { className: 'btn-blue', onClick: function(){ var n=ds.length>0?Math.max.apply(null, ds.map(function(d){return parseInt(d.No)||0;}))+1:1; setFrm({No:n, 書類名:'', カテゴリ:'その他', 保証期限:'', メモ:''}); setVw('input'); } }, '新規'), e('button', { className: 'btn-ghost', style:{background:'white'}, onClick: fetchD }, '更新'))), ld ? e('div', { className: 'text-center py-20' }, '取得中...') : e('div', { className: 'doc-table-wrapper hide-scrollbar' }, e('table', { className: 'doc-table' }, e('thead', null, e('tr', null, e('th', null, 'No'), e('th', null, '書類名'), e('th', null, 'カテゴリ'), e('th', null, '保証期限'), e('th', null, 'メモ'), e('th', null, '操作'))), e('tbody', null, ds.map(function(d) { return e('tr', { key: d.No }, e('td', null, e('span', { style: { background: 'var(--bg)', padding: '4px 8px', borderRadius: '8px', fontSize: '12px' } }, '#' + d.No)), e('td', null, d.書類名), e('td', null, e('span', { style: { fontSize: '11px', background: 'var(--bg-panel-hover)', color: 'var(--primary-dark)', padding: '4px 8px', borderRadius: '8px', fontWeight: '800' } }, d.カテゴリ)), e('td', null, d.保証期限 || '-'), e('td', null, e('div', { style: { fontSize: '12px', color: 'var(--text-muted)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, d.メモ || '-')), e('td', null, e('button', { className: 'btn-ghost', style: { color: 'var(--primary)', fontWeight: '800' }, onClick: function(){ setFrm(d); setVw('edit'); } }, '修正'))); })))));
+    }
+
+    function TransitWidget() {
+      // Mock Data 
+      var [t] = useState([{d:'小樽', tm:'14:20', r:12}, {d:'札幌', tm:'14:45', r:37}]);
+      return e('div', { className: 'widget-container h-full', style: { padding: '24px' } }, e('div', { className: 'widget-title' }, e('span', { className: 'widget-icon' }, '🚀'), '次発 (モック)'), t.map(function(d, i) { return e('div', { key: i, className: 'transit-item' }, e('div', { className: 'flex items-center gap-2' }, e('span', { style: { fontSize: '18px' } }, '🚆'), e('span', { className: 'transit-time' }, d.tm), e('span', { className: 'transit-dest' }, d.d)), e('div', { className: 'transit-diff', style: { color: i===0?'var(--accent)':'var(--primary)' } }, 'あと ' + d.r + ' 分')); }));
+    }
+
+    function TimetablesTab() {
+      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', gap: '24px', height: '100%', paddingBottom: '100px' } }, e('div', { className: 'widget-container', style: { flex: '1 1 400px', height: '100%', minHeight:'600px', padding: 0, overflow:'hidden' } }, e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚆 JR時刻表'), e('iframe', { src: "https://jrhokkaidonorikae.com/ekihatsu/ekihatsu.php?node=%E6%9C%9D%E9%87%8C&linename=%EF%BC%AA%EF%BC%B2%E5%87%BD%E9%A4%A8%E6%9C%AC%E7%B7%9A", style: { width: '100%', height: 'calc(100% - 53px)', border: 'none' } })), e('div', { className: 'widget-container', style: { flex: '1 1 400px', height: '100%', minHeight:'600px', padding: 0, overflow:'hidden' } }, e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚌 バス時刻表'), e('iframe', { src: "https://transfer.navitime.biz/chuo-bus/pc/diagram/BusCourseSearch?busstopId=00300196", style: { width: '100%', height: 'calc(100% - 53px)', border: 'none' } })));
+    }
+
+    function CalendarTab() {
+      return e('div', { className: 'container', style: { padding: '24px', height: '100%', paddingBottom: '100px' } }, e('div', { className: 'widget-container h-full', style: { padding: 0, overflow: 'hidden' } }, e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '📅 TimeTree'), e('iframe', { src: "https://timetreeapp.com/", style: { width: '100%', height: 'calc(100% - 53px)', border: 'none' } })));
+    }
+
+    function WalletTab() {
+      var SID1 = '1_iyvYbjh_Lf3Wg3GylN_ZkfjfI-wlINoQe2f0HmOLf8', SID2 = '1k2XWRJ1t3iantrOKELPs8QB4mPmtncSQF3ns7iJbNBs';
+      var [isA, setIsA] = useState(false), [pin, setPin] = useState('');
+      var [ld, setLd] = useState(true), [util, setUtil] = useState(null), [sav, setSav] = useState(null), [bank, setBank] = useState(null), [sel, setSel] = useState(null);
+      var now = new Date(), curM = (now.getFullYear()) + '/' + String(now.getMonth()+1).padStart(2,'0');
+
+      function fj(sid, q, cb) {
+        return new Promise(function(res){
+          window[cb]=function(r){res(r); delete window[cb];};
+          var s=document.createElement('script'); s.src='https://docs.google.com/spreadsheets/d/'+sid+'/gviz/tq?tqx=out:json;responseHandler:'+cb+(q?'&'+q:''); document.body.appendChild(s);
+        });
+      }
+
+      useEffect(function() {
+        Promise.all([
+          fj(SID1, 'sheet=固定費', 'cbW1'),
+          fj(SID1, 'sheet=お家積立&range=B1', 'cbW2'),
+          fj(SID1, 'sheet=旅行積立&range=B1', 'cbW3'),
+          fj(SID2, 'sheet=シート1', 'cbW4')
+        ]).then(function(r) {
+          try {
+            // 固定費
+            var rows = r[0].table.rows, cols = r[0].table.cols, u = {labels:[], data:[]};
+            var cIdx = -1;
+            for(var j=1; j<cols.length; j++) {
+              var d = cols[j].label || (rows[0] && rows[0].c && rows[0].c[j] ? (rows[0].c[j].f || rows[0].c[j].v) : '');
+              if(String(d).indexOf(curM)!==-1) cIdx = j;
+              u.labels.push(d);
+            }
+            var items = ['水道','ガス','電気'];
+            items.forEach(function(name, i){
+              var vals = [];
+              for(var k=1; k<cols.length; k++) {
+                var cell = (rows[i+1] && rows[i+1].c) ? rows[i+1].c[k] : null;
+                vals.push(cell ? cell.v : 0);
+              }
+              var curVal = (cIdx!==-1 && rows[i+1] && rows[i+1].c && rows[i+1].c[cIdx]) ? rows[i+1].c[cIdx].v : 0;
+              u.data.push({ name: name, cur: curVal, all: vals });
+            });
+            setUtil(u);
+            // 積立
+            setSav({ home: (r[1].table.rows[0] && r[1].table.rows[0].c[0]) ? r[1].table.rows[0].c[0].v : 0, travel: (r[2].table.rows[0] && r[2].table.rows[0].c[0]) ? r[2].table.rows[0].c[0].v : 0 });
+            // 銀行
+            var bRows = r[3].table.rows, b = { balance: (bRows[2] && bRows[2].c[2]) ? bRows[2].c[2].v : 0, monthly: 0, details: [] };
+            var thisM = now.getMonth(), thisY = now.getFullYear();
+            bRows.forEach(function(row){
+              if(!row || !row.c || !row.c[0]) return;
+              var val = row.c[0].f || String(row.c[0].v), d = null;
+              var m = val.match(/Date\((\d+),(\d+),(\d+)\)/);
+              if (m) d = new Date(m[1], m[2], m[3]);
+              else {
+                var p = val.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+                if (p) d = new Date(p[1], parseInt(p[2],10)-1, parseInt(p[3],10));
+              }
+              if (!d || isNaN(d.getTime())) d = new Date(row.c[0].v);
+
+              if(d && !isNaN(d.getTime()) && d.getMonth()===thisM && d.getFullYear()===thisY) {
+                var amt = Number(row.c[2] ? row.c[2].v : 0) || 0;
+                b.monthly += amt;
+                b.details.push({ date: (d.getMonth()+1)+'/'+d.getDate(), item: row.c[1]?row.c[1].v:'', amt: amt });
+              }
+            });
+            setBank(b);
+          } catch(e) { console.error(e); }
+          setLd(false);
+        }).catch(function(e){ console.error(e); setLd(false); });
+      }, []);
+
+      function num(n) { return '\u00a0' + (n||0).toLocaleString() + ' 円'; }
+      function Chart(data) {
+        var max = Math.max.apply(null, data.all); if(max===0)max=1;
+        return e('div', { className: 'flex-col gap-4', style: {marginTop:'20px'} },
+          e('div', { className: 'flex items-end justify-between', style: {height:'150px', borderBottom:'2px solid var(--border)', paddingBottom:'5px'} },
+            data.all.map(function(v, i){
+              var h = (v/max)*100;
+              return e('div', { key: i, style: {width:'6%', background: i===(now.getMonth())?'var(--primary)':'#cbd5e1', height: h+'%', borderRadius:'4px 4px 0 0', position:'relative'} },
+                e('span', { style: {position:'absolute', top:'-20px', left:'50%', transform:'translateX(-50%)', fontSize:'9px', fontWeight:'800'} }, Math.round(v/1000)+'k')
+              );
+            })
+          ),
+          e('div', { className: 'flex justify-between', style: {marginTop:'5px'} },
+            [1,2,3,4,5,6,7,8,9,10,11,12].map(function(m){ return e('span', {key:m, style:{fontSize:'10px', fontWeight:'700', width:'6%', textAlign:'center'}}, m); })
           )
         );
       }
 
-      return e('div', { className: 'container', style: { padding: '24px' } },
-        e('div', { className: 'flex justify-between items-center', style: { marginBottom: '24px' } },
-          e('h2', { className: 'logo' }, '📄 文書管理'),
-          e('div', { className: 'flex gap-2' },
-            e('button', { className: 'btn-blue', onClick: function(){ 
-              var nextNo = docs.length > 0 ? Math.max.apply(null, docs.map(function(d){ return parseInt(d.No)||0; })) + 1 : 1;
-              setFormData({ No: nextNo, 書類名: '', カテゴリ: 'その他', 保証期限: '', メモ: '' });
-              setView('input'); 
-            } }, '新規'),
-            e('button', { className: 'btn-ghost', onClick: fetchData }, '更新')
-          )
-        ),
-        loading ? e('div', { className: 'text-center py-20' }, '読み込み中...') :
-        e('div', { className: 'doc-table-wrapper hide-scrollbar' },
-          e('table', { className: 'doc-table' },
-            e('thead', null, e('tr', null, 
-              e('th', null, 'No'), e('th', null, '書類名'), e('th', null, 'カテゴリ'), e('th', null, '保証期限'), e('th', null, 'メモ'), e('th', null, '操作')
-            )),
-            e('tbody', null, docs.map(function(d) {
-              return e('tr', { key: d.No },
-                e('td', null, e('span', { style: { background: '#f1f5f9', padding: '4px 8px', borderRadius: '8px', fontSize: '11px' } }, '#' + d.No)),
-                e('td', null, d.書類名),
-                e('td', null, e('span', { style: { fontSize: '10px', background: '#eff6ff', color: '#2563eb', padding: '3px 8px', borderRadius: '6px' } }, d.カテゴリ)),
-                e('td', null, d.保証期限 || '-'),
-                e('td', null, e('div', { style: { fontSize: '11px', color: '#64748b', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, d.メモ || '-')),
-                e('td', null, e('button', { className: 'btn-ghost', style: { color: '#2563eb', fontSize: '12px' }, onClick: function(){ setFormData(d); setView('edit'); } }, '修正'))
-              );
-            }))
-          )
-        )
+      if(!isA) return e('div', {className:'flex-col items-center justify-center py-40', style:{gap:'24px'}},
+        e('span', {style:{fontSize:'32px'}}, '🔒'),
+        e('p', {style:{fontSize:'16px', fontWeight:'800', color:'var(--text-muted)'}}, 'パスコードを入力してください'),
+        e('input', { type:'password', pattern:'[0-9]*', inputMode:'numeric', className:'input-field', style:{width:'120px', textAlign:'center', fontSize:'24px', letterSpacing:'8px'}, value:pin, onChange: function(e){ var v=e.target.value; setPin(v); if(v==='0811')setIsA(true); } })
       );
-    }
 
-    // --- Main App ---
-    function App() {
-      var [activeTab, setActiveTab] = useState('main');
-      var [todosFutari, setTodosFutari] = useState([]);
-      var [todosBeni, setTodosBeni] = useState([]);
-      var [todosKou, setTodosKou] = useState([]);
+      if(ld) return e('div', {className:'text-center py-20'}, '家計データ取得中...');
+      if(!util) return e('div', {className:'text-center py-20'}, 'データエラー');
 
-      var tabs = [
-        { id: 'main', name: 'メイン', icon: '🏠' },
-        { id: 'calendar', name: 'カレンダー', icon: '📅' },
-        { id: 'shopping', name: 'お買物', icon: '🛒' },
-        { id: 'todo', name: 'TODO', icon: '📝' },
-        { id: 'transit', name: '時刻表', icon: '🚆' },
-        { id: 'docs', name: '文書', icon: '📄' }
-      ];
-
-      function renderContent() {
-        if (activeTab === 'main') {
-          return e('div', { className: 'container', style: { padding: '16px', paddingBottom: '100px', display: 'flex', flexDirection: 'column', gap: '20px' } },
-            e('div', { className: 'flex', style: { gap: '20px', flexWrap: 'wrap' } },
-              e('div', { style: { flex: '0 0 240px' } }, e(ClockWidget)),
-              e('div', { style: { flex: '1', minWidth: '320px' } }, e(WeeklyCalendarWidget))
-            ),
-            e('div', { className: 'shrink-0', style: { width: '100%' } }, e(WeatherWidget))
-          );
-        }
-        if (activeTab === 'calendar') return e(CalendarTab);
-        if (activeTab === 'shopping') return e(ShoppingListTab);
-        if (activeTab === 'todo') {
-          return e('div', { className: 'todo-flex-grid container' },
-            e(TodoColumn, { title: 'ふたり', todos: todosFutari, setTodos: setTodosFutari }),
-            e(TodoColumn, { title: '紅', todos: todosBeni, setTodos: setTodosBeni }),
-            e(TodoColumn, { title: '康', todos: todosKou, setTodos: setTodosKou })
-          );
-        }
-        if (activeTab === 'transit') return e(TimetablesTab);
-        if (activeTab === 'docs') return e(DocumentTab);
-        return e('div', { className: 'text-center py-20' }, '機能準備中...');
-      }
-
-      return e('div', { className: 'app-layout' },
-        e('header', { className: 'header' },
-          e('div', { className: 'logo' }, 'Home', e('span', null, 'Dash')),
-          e('div', { className: 'header-nav hide-scrollbar', style: { overflowX: 'auto', maxWidth: '600px' } },
-            tabs.map(function(t) {
-              return e('button', {
-                key: t.id,
-                className: 'header-nav-btn' + (activeTab === t.id ? ' active' : ''),
-                style: { whiteSpace: 'nowrap' },
-                onClick: function() { setActiveTab(t.id); }
-              }, t.name);
+      return e('div', { className: 'container flex flex-col', style: { padding: '24px', gap: '48px', paddingBottom: '120px' } },
+        // 固定費
+        e('div', { className: 'widget-container', style: {padding: '36px 24px'} },
+          e('div', { className: 'widget-title' }, e('span', { className: 'widget-icon' }, '🏠'), '今月の固定費'),
+          e('div', { className: 'flex justify-around items-center py-6' },
+            util.data.map(function(d, i){
+              var icon = i===0?'💧':(i===1?'🔥':'⚡');
+              return e('div', { key: i, className: 'flex-col items-center gap-4', style: {cursor:'pointer', flex:1}, onClick: function(){setSel({type:'chart', data:d});} },
+                e('span', { style: {fontSize:'42px'} }, icon),
+                e('div', { style: {display:'flex', alignItems:'baseline'} },
+                  e('span', { style: {fontSize:'16px', fontWeight:'800', color:'var(--text-muted)'} }, d.name),
+                  e('span', { style: {fontSize:'38px', fontWeight:'900', color:'var(--text)'} }, num(d.cur))
+                )
+              );
             })
           )
         ),
-        e('main', { className: 'main-content shrink-0' },
-          e('div', { className: 'scroll-area hide-scrollbar' }, renderContent())
+        // 積立
+        e('div', { className: 'flex flex-wrap gap-6' },
+          e('div', { className: 'widget-container', style: {flex:1, minWidth:'150px', padding:'36px 24px'} },
+            e('div', { className: 'widget-title' }, e('span', { className: 'widget-icon' }, '🏘️'), 'お家積立'),
+            e('div', { className: 'text-center py-4' }, e('span', { style: {fontSize:'42px', fontWeight:'900', color:'var(--accent)'} }, num(sav.home)))
+          ),
+          e('div', { className: 'widget-container', style: {flex:1, minWidth:'150px', padding:'36px 24px'} },
+            e('div', { className: 'widget-title' }, e('span', { className: 'widget-icon' }, '✈️'), '旅行積立'),
+            e('div', { className: 'text-center py-4' }, e('span', { style: {fontSize:'42px', fontWeight:'900', color:'var(--primary)'} }, num(sav.travel)))
+          )
         ),
-        e('nav', { className: 'bottom-nav hide-scrollbar', style: { overflowX: 'auto' } },
-          tabs.map(function(t) {
-            return e('button', {
-              key: t.id,
-              className: 'nav-item' + (activeTab === t.id ? ' active' : ''),
-              style: { minWidth: '60px' },
-              onClick: function() { setActiveTab(t.id); }
-            },
-              e('span', { className: 'nav-icon' }, t.icon),
-              e('span', null, t.name),
-              e('div', { className: 'nav-indicator' })
-            );
-          })
+        // 北洋銀行
+        e('div', { className: 'widget-container', style: {padding: '36px 24px'} },
+          e('div', { className: 'widget-title' }, e('span', { className: 'widget-icon' }, '🏦'), '北洋銀行'),
+          e('div', { className: 'flex justify-around items-center py-6' },
+            e('div', { className: 'flex items-baseline gap-2', style: {flex:1, justifyContent:'center'} },
+              e('span', { style: {fontSize:'16px', fontWeight:'800', color:'var(--text-muted)'} }, '預かり残高'),
+              e('span', { style: {fontSize:'42px', fontWeight:'900', color:'var(--text)'} }, num(bank.balance))
+            ),
+            e('div', { className: 'flex items-baseline gap-2', style: {flex:1, cursor:'pointer', justifyContent:'center'}, onClick: function(){setSel({type:'bank'});} },
+              e('span', { style: {fontSize:'16px', fontWeight:'800', color:'var(--text-muted)'} }, '当月利用額'),
+              e('span', { style: {fontSize:'42px', fontWeight:'900', color:'var(--red)'} }, num(bank.monthly))
+            )
+          )
+        ),
+        // Modals
+        sel && e('div', { className: 'modal-overlay', onClick: function(){setSel(null);} },
+          e('div', { className: 'modal-content', style: {maxWidth:'750px', width:'95%'}, onClick: function(ev){ev.stopPropagation();} },
+            e('div', { className: 'flex justify-between items-center', style: { marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '12px' } },
+              e('h3', { style: { margin: 0, fontSize: '18px', fontWeight: '900' } }, sel.type==='chart' ? sel.data.name + ' の年間推移' : '北洋銀行 利用明細'),
+              e('button', { className: 'btn-ghost', style: {fontSize:'20px'}, onClick: function(){ setSel(null); } }, '✕')
+            ),
+            sel.type==='chart' ? Chart(sel.data) :
+            e('div', { className: 'doc-table-wrapper hide-scrollbar', style: {maxHeight:'500px', overflowY:'auto'} },
+              e('table', { className: 'doc-table', style: {minWidth:'unset'} },
+                e('thead', null, e('tr', null, e('th', null, '日付'), e('th', null, '項目'), e('th', {style:{textAlign:'right'}}, '金額'))),
+                e('tbody', null, bank.details.map(function(d, i){ return e('tr', {key:i}, e('td', {style:{whiteSpace:'nowrap'}}, d.date), e('td', null, d.item), e('td', {style:{textAlign:'right', fontWeight:'900'}}, num(d.amt))); }))
+              )
+            )
+          )
         )
       );
     }
 
-    // --- Boot ---
-    try {
-      ReactDOM.render(e(App), document.getElementById('root'));
-    } catch (err) {
-      document.getElementById('root').innerHTML = '<div style="padding:40px; color:red; font-weight:bold;">' +
-        'システム読み込みエラー: ' + err.message + '<br><small>iOS 12の互換性制限により起動できませんでした。</small></div>';
+    function App() {
+      var [tab, setTab] = useState('main');
+      var ts = [ {id:'main',n:'メイン',i:'🏠'}, {id:'wallet',n:'お財布',i:'💰'}, {id:'calendar',n:'カレンダー',i:'📅'}, {id:'shopping',n:'買物',i:'🛒'}, {id:'todo',n:'TODO',i:'📝'}, {id:'transit',n:'時刻表',i:'🚆'}, {id:'docs',n:'文書',i:'📄'} ];
+      function rC() {
+        if(tab==='main') return e('div', { className: 'container flex flex-col', style: { padding: '24px', paddingBottom: '100px', gap: '24px' } }, e('div', { className: 'w-full' }, e(WeeklyCalendarWidget)), e('div', { className: 'flex flex-wrap', style: { gap: '24px', alignItems: 'stretch' } }, e('div', { style: { flex: '1 1 300px', minWidth: '300px' } }, e(TransitWidget)), e('div', { style: { flex: '2 1 450px', minWidth: '400px' } }, e(WeatherWidget))));
+        if(tab==='wallet') return e(WalletTab);
+        if(tab==='calendar') return e(CalendarTab); if(tab==='shopping') return e(ShoppingTab); if(tab==='todo') return e(TodoTab); if(tab==='transit') return e(TimetablesTab); if(tab==='docs') return e(DocumentTab); return e('div', null);
+      }
+      return e('div', { className: 'app-layout' },
+        e('header', { className: 'header' }, e('div', { className: 'flex items-center' }, e('div', { className: 'logo' }, 'Home', e('span', null, 'Dash')), e(HeaderClockWidget)), e('div', { className: 'header-nav hide-scrollbar', style: { overflowX: 'auto' } }, ts.map(function(t){ return e('button', { key: t.id, className: 'header-nav-btn'+(tab===t.id?' active':''), onClick: function(){setTab(t.id);} }, t.n); }))),
+        e('main', { className: 'main-content shrink-0' }, e('div', { className: 'scroll-area hide-scrollbar' }, rC())),
+        e('nav', { className: 'bottom-nav hide-scrollbar', style: { overflowX: 'auto' } }, ts.map(function(t){ return e('button', { key: t.id, className: 'nav-item'+(tab===t.id?' active':''), style: { minWidth: '60px' }, onClick: function(){setTab(t.id);} }, e('span', { className: 'nav-icon' }, t.i), e('span', null, t.n), e('div', { className: 'nav-indicator' })); }))
+      );
     }
+
+    try { ReactDOM.render(e(App), document.getElementById('root')); } catch (err) { document.getElementById('root').innerHTML = '<div style="padding:40px; color:#ef4444; font-weight:bold;">エラー: ' + err.message + '</div>'; }
   </script>
 </body>
 </html>
