@@ -67,7 +67,16 @@
     .items-center { align-items: center; } .justify-center { justify-content: center; } .justify-between { justify-content: space-between; }
     .text-center { text-align: center; } .w-full { width: 100%; } .h-full { height: 100%; }
     .gap-1 > * + * { margin-left: 4px; } .gap-2 > * + * { margin-left: 8px; } .gap-3 > * + * { margin-left: 12px; } .gap-4 > * + * { margin-left: 16px; } .flex-wrap { flex-wrap: wrap; }
-    .flex-col.gap-2 > * + * { margin-top: 8px; margin-left: 0; } .flex-col.gap-4 > * + * { margin-top: 16px; margin-left: 0; }
+    .flex-col > * + * { margin-top: 0; margin-left: 0; }
+    .flex-col.gap-2 > * + * { margin-top: 8px; margin-left: 0; } 
+    .flex-col.gap-4 > * + * { margin-top: 16px; margin-left: 0; }
+    .flex-col.gap-8 > * + * { margin-top: 32px; margin-left: 0; }
+    
+    /* Responsive Spacing for iOS 12 */
+    .ios-gap-8 { margin: -16px; }
+    .ios-gap-12 { margin: -24px; }
+    .ios-gap-8 > * { padding: 16px; }
+    .ios-gap-12 > * { padding: 24px; }
 
     /* Header Clock */
     .header-clock { display: flex; align-items: center; margin-left: 16px; background: rgba(59, 130, 246, 0.1); padding: 4px 12px; border-radius: 12px; }
@@ -77,7 +86,8 @@
     @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
     /* Weather Widget */
-    .weather-widget-horizontal { flex-direction: row !important; align-items: center !important; padding: 16px 24px !important; gap: 20px !important; }
+    .weather-widget-horizontal { flex-direction: row !important; align-items: center !important; padding: 16px 24px !important; }
+    .weather-widget-horizontal > * + * { margin-left: 20px; }
     .weather-info-mini { display: flex; flex-direction: column; align-items: center; width: 100px; flex-shrink: 0; border-right: 1px solid #bfdbfe; padding-right: 20px; }
     .weather-loc { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
     .weather-desc { font-size: 10px; font-weight: bold; opacity: 0.8; text-align: center; }
@@ -287,7 +297,7 @@
             e('tr', null, e('td', { style: { fontWeight: '800', fontSize: '16px', color: 'var(--accent)' } }, '♻️ ゴミ'), wD.map(function(d){ var g = getG(gb&&gb[d.ds]); return e('td', { key: d.ds, style: { background: d.ist ? '#fefce8' : '' }, onClick: function(){ setSel(d.ds); } }, g ? e('div', { style: { background: g.bg, color: g.c, padding: '8px 0', borderRadius: '8px', fontWeight: 'bold', fontSize:'13px' } }, gb&&gb[d.ds]) : '-'); }))
           )
         ),
-        sel && e('div', { className: 'modal-overlay', onClick: function(){ setSel(null); } },
+        sel && ReactDOM.createPortal(e('div', { className: 'modal-overlay', onClick: function(){ setSel(null); } },
           e('div', { className: 'modal-content', onClick: function(ev){ev.stopPropagation();} },
             e('div', { className: 'flex justify-between items-center', style: { marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '12px' } },
               e('h3', { style: { margin: 0, fontSize: '18px', fontWeight: '900' } }, sel.slice(5).replace('-','/') + ' の詳細'), e('button', { className: 'btn-ghost', style: {fontSize:'20px'}, onClick: function(){ setSel(null); } }, '✕')
@@ -303,7 +313,7 @@
               );
             })()
           )
-        )
+        ), document.body)
       );
     }
 
@@ -322,8 +332,8 @@
       
       var tmr; function tStart(e, it) { var t=e.touches[0]; tmr=setTimeout(function(){ setCtx({x:t.clientX, y:t.clientY, it:it}); }, 600); } function tEnd(){ clearTimeout(tmr); }
       
-      return e('div', { className: 'container', style: { padding: '24px', display: 'flex', gap: '32px', height: '100%', minHeight: '800px', paddingBottom: '120px', flexWrap: 'wrap' }, onClick: function(){ if(ctx)setCtx(null); } },
-        e('div', { className: 'widget-container', style: { flex: '1 1 350px' } },
+      return e('div', { className: 'container', style: { padding: '24px', display: 'flex', flexWrap: 'wrap', height: '100%', minHeight: '800px', paddingBottom: '120px' }, onClick: function(){ if(ctx)setCtx(null); } },
+        e('div', { className: 'widget-container', style: { flex: '1 1 350px', margin: '16px' } },
           e('div', { className: 'flex justify-between items-center', style: { marginBottom: '16px' } },
             e('h2', { className: 'widget-title', style: { margin: 0 } }, e('span', { className: 'widget-icon' }, '🛒'), 'リスト'),
             e('div', { className: 'flex gap-2' },
@@ -354,7 +364,7 @@
             );
           }), e('p', {style:{fontSize:'10px', color:'var(--text-muted)', textAlign:'center', marginTop:'16px'}}, '右クリック/長押しで別カテゴリへコピー'))
         ),
-        e('div', { className: 'widget-container', style: { flex: '2 1 450px', padding: 16 } },
+        e('div', { className: 'widget-container', style: { flex: '2 1 450px', padding: 16, margin: '16px' } },
           e('div', { className: 'flex gap-2 hide-scrollbar', style: { overflowX: 'auto', marginBottom: '16px' } }, Object.keys(fl).map(function(s){ return e('button', { key: s, className: 'header-nav-btn'+(st===s?' active':''), onClick: function(){setSt(s);} }, s); })),
           e('div', { className: 'iframe-wrapper' }, e('iframe', { src: fl[st] }))
         ),
@@ -402,10 +412,10 @@
 
       if(ld) return e('div', {className:'text-center py-20'}, 'TODO取得中...');
 
-      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', gap: '32px', paddingBottom: '120px' } }, 
-        e(TodoCol, {title:'ふたり', owner:'ふたり', todos:tf, allTodos:all, onSave:saveT}), 
-        e(TodoCol, {title:'紅', owner:'紅', todos:tb, allTodos:all, onSave:saveT}), 
-        e(TodoCol, {title:'康', owner:'康', todos:tk, allTodos:all, onSave:saveT})
+      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', paddingBottom: '120px' } }, 
+        e('div', { style: { flex: '1 1 300px', margin: '16px' } }, e(TodoCol, {title:'ふたり', owner:'ふたり', todos:tf, allTodos:all, onSave:saveT})), 
+        e('div', { style: { flex: '1 1 300px', margin: '16px' } }, e(TodoCol, {title:'紅', owner:'紅', todos:tb, allTodos:all, onSave:saveT})), 
+        e('div', { style: { flex: '1 1 300px', margin: '16px' } }, e(TodoCol, {title:'康', owner:'康', todos:tk, allTodos:all, onSave:saveT}))
       );
     }
 
@@ -418,7 +428,7 @@
       
       if(vw==='input'||vw==='edit') return e('div', { className: 'container', style: { padding: '24px' } }, e('div', { className: 'widget-container', style: { maxWidth: '500px', margin: '0 auto' } }, e('h2', { className: 'widget-title' }, vw==='edit'?'修正':'新規登録'), e('div', { className: 'flex-col gap-4' }, e('div', null, e('label', {style:{fontSize:'12px',fontWeight:'800'}}, 'No'), e('input', { className: 'input-field', value: frm.No, disabled: vw==='edit', onChange: function(e){setFrm(Object.assign({},frm,{No:e.target.value}));} })), e('div', null, e('label', {style:{fontSize:'12px',fontWeight:'800'}}, '書類名'), e('input', { className: 'input-field', value: frm.書類名, onChange: function(e){setFrm(Object.assign({},frm,{書類名:e.target.value}));} })), e('div', null, e('label', {style:{fontSize:'12px',fontWeight:'800'}}, 'カテゴリ'), e('select', { className: 'input-field', value: frm.カテゴリ, onChange: function(e){setFrm(Object.assign({},frm,{カテゴリ:e.target.value}));} }, e('option', {value:'保証書'}, '保証書'), e('option', {value:'契約書'}, '契約書'), e('option', {value:'医療'}, '医療'), e('option', {value:'その他'}, 'その他'))), e('div', null, e('label', {style:{fontSize:'12px',fontWeight:'800'}}, 'メモ'), e('textarea', { className: 'input-field', rows: 3, value: frm.メモ, onChange: function(e){setFrm(Object.assign({},frm,{メモ:e.target.value}));} })), e('div', { className: 'flex gap-2', style: {marginTop:'10px'} }, e('button', { className: 'btn-blue', style: {flex:1}, onClick: save }, '保存'), e('button', { className: 'btn-ghost', style: {flex:1, background:'var(--bg-panel-hover)'}, onClick: function(){setVw('list');} }, 'キャンセル')), st && e('div', { style: { textAlign: 'center', marginTop: '10px', color: 'var(--primary)', fontWeight: 'bold' } }, st))));
       
-      return e('div', { className: 'container', style: { padding: '24px', paddingBottom: '100px' } }, e('div', { className: 'flex justify-between items-center', style: { marginBottom: '24px' } }, e('h2', { className: 'widget-title', style: {margin:0} }, e('span', {className:'widget-icon'}, '📄'), '文書管理'), e('div', { className: 'flex gap-2' }, e('button', { className: 'btn-blue', onClick: function(){ var n=ds.length>0?Math.max.apply(null, ds.map(function(d){return parseInt(d.No)||0;}))+1:1; setFrm({No:n, 書類名:'', カテゴリ:'その他', 保証期限:'', メモ:''}); setVw('input'); } }, '新規'), e('button', { className: 'btn-ghost', style:{background:'white'}, onClick: fetchD }, '更新'))), ld ? e('div', { className: 'text-center py-20' }, '取得中...') : e('div', { className: 'doc-table-wrapper hide-scrollbar' }, e('table', { className: 'doc-table' }, e('thead', null, e('tr', null, e('th', null, 'No'), e('th', null, '書類名'), e('th', null, 'カテゴリ'), e('th', null, '保証期限'), e('th', null, 'メモ'), e('th', null, '操作'))), e('tbody', null, ds.map(function(d) { return e('tr', { key: d.No }, e('td', null, e('span', { style: { background: 'var(--bg)', padding: '4px 8px', borderRadius: '8px', fontSize: '12px' } }, '#' + d.No)), e('td', null, d.書類名), e('td', null, e('span', { style: { fontSize: '11px', background: 'var(--bg-panel-hover)', color: 'var(--primary-dark)', padding: '4px 8px', borderRadius: '8px', fontWeight: '800' } }, d.カテゴリ)), e('td', null, d.保証期限 || '-'), e('td', null, e('div', { style: { fontSize: '12px', color: 'var(--text-muted)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, d.メモ || '-')), e('td', null, e('button', { className: 'btn-ghost', style: { color: 'var(--primary)', fontWeight: '800' }, onClick: function(){ setFrm(d); setVw('edit'); } }, '修正'))); })))));
+      return e('div', { className: 'container', style: { padding: '24px', paddingBottom: '120px' } }, e('div', { className: 'flex justify-between items-center', style: { marginBottom: '24px' } }, e('h2', { className: 'widget-title', style: {margin:0} }, e('span', {className:'widget-icon'}, '📄'), '文書管理'), e('div', { className: 'flex' }, e('button', { className: 'btn-blue', style: {marginRight:'8px'}, onClick: function(){ var n=ds.length>0?Math.max.apply(null, ds.map(function(d){return parseInt(d.No)||0;}))+1:1; setFrm({No:n, 書類名:'', カテゴリ:'その他', 保証期限:'', メモ:''}); setVw('input'); } }, '新規'), e('button', { className: 'btn-ghost', style:{background:'white'}, onClick: function(){fetchD();} }, '更新'))), ld ? e('div', { className: 'text-center py-20' }, '取得中...') : e('div', { className: 'doc-table-wrapper hide-scrollbar' }, e('table', { className: 'doc-table' }, e('thead', null, e('tr', null, e('th', null, 'No'), e('th', null, '書類名'), e('th', null, 'カテゴリ'), e('th', null, '保証期限'), e('th', null, 'メモ'), e('th', null, '操作'))), e('tbody', null, ds.map(function(d) { return e('tr', { key: d.No }, e('td', null, e('span', { style: { background: 'var(--bg)', padding: '4px 8px', borderRadius: '8px', fontSize: '12px' } }, '#' + d.No)), e('td', null, d.書類名), e('td', null, e('span', { style: { fontSize: '11px', background: 'var(--bg-panel-hover)', color: 'var(--primary-dark)', padding: '4px 8px', borderRadius: '8px', fontWeight: '800' } }, d.カテゴリ)), e('td', null, d.保証期限 || '-'), e('td', null, e('div', { style: { fontSize: '12px', color: 'var(--text-muted)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, d.メモ || '-')), e('td', null, e('button', { className: 'btn-ghost', style: { color: 'var(--primary)', fontWeight: '800' }, onClick: function(){ setFrm(d); setVw('edit'); } }, '修正'))); })))));
     }
 
     function TransitWidget() {
@@ -428,12 +438,12 @@
     }
 
     function TimetablesTab() {
-      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', gap: '32px', height: '100%', paddingBottom: '120px' } }, 
-        e('div', { className: 'widget-container', style: { flex: '1 1 400px', height: '100%', minHeight:'750px', padding: 0, overflow:'hidden' } }, 
+      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', paddingBottom: '120px' } }, 
+        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '16px', minHeight:'750px', padding: 0, overflow:'hidden' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚆 JR時刻表'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://jrhokkaidonorikae.com/ekihatsu/ekihatsu.php?node=%E6%9C%9D%E9%87%8C&linename=%EF%BC%AA%EF%BC%B2%E5%87%BD%E9%A4%A8%E6%9C%AC%E7%B7%9A" }))
         ), 
-        e('div', { className: 'widget-container', style: { flex: '1 1 400px', height: '100%', minHeight:'750px', padding: 0, overflow:'hidden' } }, 
+        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '16px', minHeight:'750px', padding: 0, overflow:'hidden' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚌 バス時刻表'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://transfer.navitime.biz/chuo-bus/pc/diagram/BusCourseSearch?busstopId=00300196" }))
         )
@@ -441,8 +451,8 @@
     }
 
     function CalendarTab() {
-      return e('div', { className: 'container', style: { padding: '24px', height: '100%', paddingBottom: '120px' } }, 
-        e('div', { className: 'widget-container h-full', style: { padding: 0, overflow: 'hidden', minHeight: '800px' } }, 
+      return e('div', { className: 'container', style: { padding: '24px', paddingBottom: '120px' } }, 
+        e('div', { className: 'widget-container', style: { padding: 0, overflow: 'hidden', minHeight: '800px', margin: '16px' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '📅 TimeTree'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://timetreeapp.com/" }))
         )
@@ -617,7 +627,13 @@
       var [tab, setTab] = useState('main');
       var ts = [ {id:'main',n:'メイン',i:'🏠'}, {id:'wallet',n:'お財布',i:'💰'}, {id:'calendar',n:'カレンダー',i:'📅'}, {id:'shopping',n:'買物',i:'🛒'}, {id:'todo',n:'TODO',i:'📝'}, {id:'transit',n:'時刻表',i:'🚆'}, {id:'docs',n:'文書',i:'📄'} ];
       function rC() {
-        if(tab==='main') return e('div', { className: 'container flex flex-col', style: { padding: '24px', paddingBottom: '120px', gap: '32px' } }, e('div', { className: 'w-full' }, e(WeeklyCalendarWidget)), e('div', { className: 'flex flex-wrap', style: { gap: '32px', alignItems: 'stretch' } }, e('div', { style: { flex: '1 1 300px', minWidth: '300px' } }, e(TransitWidget)), e('div', { style: { flex: '2 1 450px', minWidth: '400px' } }, e(WeatherWidget))));
+        if(tab==='main') return e('div', { className: 'container flex flex-col', style: { padding: '24px', paddingBottom: '120px' } }, 
+          e('div', { className: 'w-full', style: { marginBottom: '32px' } }, e(WeeklyCalendarWidget)), 
+          e('div', { className: 'flex flex-wrap' }, 
+            e('div', { style: { flex: '1 1 300px', minWidth: '300px', margin: '16px' } }, e(TransitWidget)), 
+            e('div', { style: { flex: '2 1 450px', minWidth: '400px', margin: '16px' } }, e(WeatherWidget))
+          )
+        );
         if(tab==='wallet') return e(WalletTab);
         if(tab==='calendar') return e(CalendarTab); if(tab==='shopping') return e(ShoppingTab); if(tab==='todo') return e(TodoTab); if(tab==='transit') return e(TimetablesTab); if(tab==='docs') return e(DocumentTab); return e('div', null);
       }
