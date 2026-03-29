@@ -442,11 +442,11 @@
 
     function TimetablesTab() {
       return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', paddingBottom: '120px' } }, 
-        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '10px', minHeight:'650px', padding: 0, overflow:'hidden' } }, 
+        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '10px', minHeight:'550px', padding: 0, overflow:'hidden' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚆 JR時刻表'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://jrhokkaidonorikae.com/ekihatsu/ekihatsu.php?node=%E6%9C%9D%E9%87%8C&linename=%EF%BC%AA%EF%BC%B2%E5%87%BD%E9%A4%A8%E6%9C%AC%E7%B7%9A" }))
         ), 
-        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '10px', minHeight:'650px', padding: 0, overflow:'hidden' } }, 
+        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '10px', minHeight:'550px', padding: 0, overflow:'hidden' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚌 バス時刻表'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://transfer.navitime.biz/chuo-bus/pc/diagram/BusCourseSearch?busstopId=00300196" }))
         )
@@ -455,7 +455,7 @@
 
     function CalendarTab() {
       return e('div', { className: 'container', style: { padding: '24px', paddingBottom: '120px' } }, 
-        e('div', { className: 'widget-container', style: { padding: 0, overflow: 'hidden', minHeight: '650px', margin: '10px' } }, 
+        e('div', { className: 'widget-container', style: { padding: 0, overflow: 'hidden', minHeight: '550px', margin: '10px' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '📅 TimeTree'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://timetreeapp.com/" }))
         )
