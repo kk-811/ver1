@@ -125,8 +125,19 @@
     .doc-table td { padding: 15px 12px; border-bottom: 1px solid var(--bg-panel-hover); font-size: 14px; font-weight: 700; color: var(--text); }
 
     /* Modal */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .modal-content { background: white; width: 100%; max-width: 320px; border-radius: 24px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { background: white; width: 100%; max-width: 380px; border-radius: 24px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; }
+    
+    /* Scroll fix for Iframes on iOS */
+    .iframe-wrapper { 
+      width: 100%; height: 100%; overflow: auto; -webkit-overflow-scrolling: touch; 
+    }
+    .iframe-wrapper iframe { height: 100%; width: 100%; border: none; }
+
+    @media (max-width: 1024px) {
+      .container { gap: 32px !important; }
+      .widget-container { margin-bottom: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -161,7 +172,7 @@
 
     function HeaderClockWidget() {
       var [t, setT] = useState(new Date()), [s, setS] = useState(false);
-      useEffect(function() { var tm=setInterval(function(){setT(new Date());},1000); return function(){clearInterval(tm);}; }, []);
+      useEffect(function() { var tm=setInterval(function(){setT(new Date());}, 200); return function(){clearInterval(tm);}; }, []);
       var h = String(t.getHours()).padStart(2, '0');
       var m = String(t.getMinutes()).padStart(2, '0');
       var ms = String(t.getSeconds()).padStart(2, '0');
@@ -311,7 +322,7 @@
       
       var tmr; function tStart(e, it) { var t=e.touches[0]; tmr=setTimeout(function(){ setCtx({x:t.clientX, y:t.clientY, it:it}); }, 600); } function tEnd(){ clearTimeout(tmr); }
       
-      return e('div', { className: 'container', style: { padding: '24px', display: 'flex', gap: '24px', height: '100%', paddingBottom: '100px', flexWrap: 'wrap' }, onClick: function(){ if(ctx)setCtx(null); } },
+      return e('div', { className: 'container', style: { padding: '24px', display: 'flex', gap: '32px', height: '100%', minHeight: '800px', paddingBottom: '120px', flexWrap: 'wrap' }, onClick: function(){ if(ctx)setCtx(null); } },
         e('div', { className: 'widget-container', style: { flex: '1 1 350px' } },
           e('div', { className: 'flex justify-between items-center', style: { marginBottom: '16px' } },
             e('h2', { className: 'widget-title', style: { margin: 0 } }, e('span', { className: 'widget-icon' }, '🛒'), 'リスト'),
@@ -345,7 +356,7 @@
         ),
         e('div', { className: 'widget-container', style: { flex: '2 1 450px', padding: 16 } },
           e('div', { className: 'flex gap-2 hide-scrollbar', style: { overflowX: 'auto', marginBottom: '16px' } }, Object.keys(fl).map(function(s){ return e('button', { key: s, className: 'header-nav-btn'+(st===s?' active':''), onClick: function(){setSt(s);} }, s); })),
-          e('iframe', { src: fl[st], style: { width: '100%', height: '100%', border: '1px solid #e2e8f0', borderRadius: '12px' } })
+          e('div', { className: 'iframe-wrapper' }, e('iframe', { src: fl[st] }))
         ),
         ctx && e('div', { style: { position: 'fixed', top: ctx.y, left: Math.min(ctx.x, window.innerWidth-160), background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: 'var(--shadow-hover)', zIndex: 2000, width: '150px', padding: '8px 0' } },
           e('p', { style: { fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', padding: '4px 12px', margin: 0 } }, 'コピー先:'),
@@ -391,7 +402,7 @@
 
       if(ld) return e('div', {className:'text-center py-20'}, 'TODO取得中...');
 
-      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', gap: '24px', paddingBottom: '100px' } }, 
+      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', gap: '32px', paddingBottom: '120px' } }, 
         e(TodoCol, {title:'ふたり', owner:'ふたり', todos:tf, allTodos:all, onSave:saveT}), 
         e(TodoCol, {title:'紅', owner:'紅', todos:tb, allTodos:all, onSave:saveT}), 
         e(TodoCol, {title:'康', owner:'康', todos:tk, allTodos:all, onSave:saveT})
@@ -417,11 +428,25 @@
     }
 
     function TimetablesTab() {
-      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', gap: '24px', height: '100%', paddingBottom: '100px' } }, e('div', { className: 'widget-container', style: { flex: '1 1 400px', height: '100%', minHeight:'600px', padding: 0, overflow:'hidden' } }, e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚆 JR時刻表'), e('iframe', { src: "https://jrhokkaidonorikae.com/ekihatsu/ekihatsu.php?node=%E6%9C%9D%E9%87%8C&linename=%EF%BC%AA%EF%BC%B2%E5%87%BD%E9%A4%A8%E6%9C%AC%E7%B7%9A", style: { width: '100%', height: 'calc(100% - 53px)', border: 'none' } })), e('div', { className: 'widget-container', style: { flex: '1 1 400px', height: '100%', minHeight:'600px', padding: 0, overflow:'hidden' } }, e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚌 バス時刻表'), e('iframe', { src: "https://transfer.navitime.biz/chuo-bus/pc/diagram/BusCourseSearch?busstopId=00300196", style: { width: '100%', height: 'calc(100% - 53px)', border: 'none' } })));
+      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', gap: '32px', height: '100%', paddingBottom: '120px' } }, 
+        e('div', { className: 'widget-container', style: { flex: '1 1 400px', height: '100%', minHeight:'750px', padding: 0, overflow:'hidden' } }, 
+          e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚆 JR時刻表'), 
+          e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://jrhokkaidonorikae.com/ekihatsu/ekihatsu.php?node=%E6%9C%9D%E9%87%8C&linename=%EF%BC%AA%EF%BC%B2%E5%87%BD%E9%A4%A8%E6%9C%AC%E7%B7%9A" }))
+        ), 
+        e('div', { className: 'widget-container', style: { flex: '1 1 400px', height: '100%', minHeight:'750px', padding: 0, overflow:'hidden' } }, 
+          e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚌 バス時刻表'), 
+          e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://transfer.navitime.biz/chuo-bus/pc/diagram/BusCourseSearch?busstopId=00300196" }))
+        )
+      );
     }
 
     function CalendarTab() {
-      return e('div', { className: 'container', style: { padding: '24px', height: '100%', paddingBottom: '100px' } }, e('div', { className: 'widget-container h-full', style: { padding: 0, overflow: 'hidden' } }, e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '📅 TimeTree'), e('iframe', { src: "https://timetreeapp.com/", style: { width: '100%', height: 'calc(100% - 53px)', border: 'none' } })));
+      return e('div', { className: 'container', style: { padding: '24px', height: '100%', paddingBottom: '120px' } }, 
+        e('div', { className: 'widget-container h-full', style: { padding: 0, overflow: 'hidden', minHeight: '800px' } }, 
+          e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '📅 TimeTree'), 
+          e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://timetreeapp.com/" }))
+        )
+      );
     }
 
     function WalletTab() {
@@ -437,7 +462,8 @@
         });
       }
 
-      useEffect(function() {
+      function load() {
+        setLd(true);
         Promise.all([
           fj(SID1, 'sheet=固定費', 'cbW1'),
           fj(SID1, 'sheet=お家積立&range=B1', 'cbW2'),
@@ -490,7 +516,14 @@
           } catch(e) { console.error(e); }
           setLd(false);
         }).catch(function(e){ console.error(e); setLd(false); });
+      }
+
+      useEffect(function() {
+        load();
+        var tm=setInterval(load, 300000);
+        return function(){clearInterval(tm);};
       }, []);
+
 
       function num(n) { return '\u00a0' + (n||0).toLocaleString() + ' 円'; }
       function Chart(data) {
@@ -584,7 +617,7 @@
       var [tab, setTab] = useState('main');
       var ts = [ {id:'main',n:'メイン',i:'🏠'}, {id:'wallet',n:'お財布',i:'💰'}, {id:'calendar',n:'カレンダー',i:'📅'}, {id:'shopping',n:'買物',i:'🛒'}, {id:'todo',n:'TODO',i:'📝'}, {id:'transit',n:'時刻表',i:'🚆'}, {id:'docs',n:'文書',i:'📄'} ];
       function rC() {
-        if(tab==='main') return e('div', { className: 'container flex flex-col', style: { padding: '24px', paddingBottom: '100px', gap: '24px' } }, e('div', { className: 'w-full' }, e(WeeklyCalendarWidget)), e('div', { className: 'flex flex-wrap', style: { gap: '24px', alignItems: 'stretch' } }, e('div', { style: { flex: '1 1 300px', minWidth: '300px' } }, e(TransitWidget)), e('div', { style: { flex: '2 1 450px', minWidth: '400px' } }, e(WeatherWidget))));
+        if(tab==='main') return e('div', { className: 'container flex flex-col', style: { padding: '24px', paddingBottom: '120px', gap: '32px' } }, e('div', { className: 'w-full' }, e(WeeklyCalendarWidget)), e('div', { className: 'flex flex-wrap', style: { gap: '32px', alignItems: 'stretch' } }, e('div', { style: { flex: '1 1 300px', minWidth: '300px' } }, e(TransitWidget)), e('div', { style: { flex: '2 1 450px', minWidth: '400px' } }, e(WeatherWidget))));
         if(tab==='wallet') return e(WalletTab);
         if(tab==='calendar') return e(CalendarTab); if(tab==='shopping') return e(ShoppingTab); if(tab==='todo') return e(TodoTab); if(tab==='transit') return e(TimetablesTab); if(tab==='docs') return e(DocumentTab); return e('div', null);
       }
