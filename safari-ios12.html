@@ -108,7 +108,10 @@
     /* Calendar / TODO / Form */
     .todo-input-group { display: flex; background: var(--bg-panel-hover); padding: 6px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
     .todo-input { border: none; background: transparent; padding: 0 12px; font-weight: bold; font-size: 14px; flex: 1; outline: none; color: var(--text); }
-    .btn-add { background: var(--accent); color: white; border: none; width: 40px; height: 40px; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; }
+    .btn-add { 
+      background: var(--accent); color: white; border: none; width: 40px; height: 40px; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; padding: 0; line-height: 1;
+    }
     .todo-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dotted var(--border); }
     .checkbox { width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 6px; position: relative; cursor: pointer; margin-right: 12px; transition: all 0.2s; background: white; }
     .checkbox.checked { background: var(--accent); border-color: var(--accent); }
@@ -332,8 +335,8 @@
       
       var tmr; function tStart(e, it) { var t=e.touches[0]; tmr=setTimeout(function(){ setCtx({x:t.clientX, y:t.clientY, it:it}); }, 600); } function tEnd(){ clearTimeout(tmr); }
       
-      return e('div', { className: 'container', style: { padding: '24px', display: 'flex', flexWrap: 'wrap', height: '100%', minHeight: '800px', paddingBottom: '120px' }, onClick: function(){ if(ctx)setCtx(null); } },
-        e('div', { className: 'widget-container', style: { flex: '1 1 350px', margin: '16px' } },
+      return e('div', { className: 'container', style: { padding: '24px', display: 'flex', flexWrap: 'wrap', height: '100%', minHeight: '700px', paddingBottom: '120px' }, onClick: function(){ if(ctx)setCtx(null); } },
+        e('div', { className: 'widget-container', style: { flex: '1 1 350px', margin: '10px' } },
           e('div', { className: 'flex justify-between items-center', style: { marginBottom: '16px' } },
             e('h2', { className: 'widget-title', style: { margin: 0 } }, e('span', { className: 'widget-icon' }, '🛒'), 'リスト'),
             e('div', { className: 'flex gap-2' },
@@ -364,7 +367,7 @@
             );
           }), e('p', {style:{fontSize:'10px', color:'var(--text-muted)', textAlign:'center', marginTop:'16px'}}, '右クリック/長押しで別カテゴリへコピー'))
         ),
-        e('div', { className: 'widget-container', style: { flex: '2 1 450px', padding: 16, margin: '16px' } },
+        e('div', { className: 'widget-container', style: { flex: '2 1 450px', padding: 16, margin: '10px' } },
           e('div', { className: 'flex gap-2 hide-scrollbar', style: { overflowX: 'auto', marginBottom: '16px' } }, Object.keys(fl).map(function(s){ return e('button', { key: s, className: 'header-nav-btn'+(st===s?' active':''), onClick: function(){setSt(s);} }, s); })),
           e('div', { className: 'iframe-wrapper' }, e('iframe', { src: fl[st] }))
         ),
@@ -412,10 +415,10 @@
 
       if(ld) return e('div', {className:'text-center py-20'}, 'TODO取得中...');
 
-      return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', paddingBottom: '120px' } }, 
-        e('div', { style: { flex: '1 1 300px', margin: '16px' } }, e(TodoCol, {title:'ふたり', owner:'ふたり', todos:tf, allTodos:all, onSave:saveT})), 
-        e('div', { style: { flex: '1 1 300px', margin: '16px' } }, e(TodoCol, {title:'紅', owner:'紅', todos:tb, allTodos:all, onSave:saveT})), 
-        e('div', { style: { flex: '1 1 300px', margin: '16px' } }, e(TodoCol, {title:'康', owner:'康', todos:tk, allTodos:all, onSave:saveT}))
+      return e('div', { className: 'container flex', style: { padding: '24px', paddingBottom: '120px', flexWrap: 'nowrap' } }, 
+        e('div', { style: { flex: '1 1 0%', margin: '10px', minWidth: '180px' } }, e(TodoCol, {title:'ふたり', owner:'ふたり', todos:tf, allTodos:all, onSave:saveT})), 
+        e('div', { style: { flex: '1 1 0%', margin: '10px', minWidth: '180px' } }, e(TodoCol, {title:'紅', owner:'紅', todos:tb, allTodos:all, onSave:saveT})), 
+        e('div', { style: { flex: '1 1 0%', margin: '10px', minWidth: '180px' } }, e(TodoCol, {title:'康', owner:'康', todos:tk, allTodos:all, onSave:saveT}))
       );
     }
 
@@ -439,11 +442,11 @@
 
     function TimetablesTab() {
       return e('div', { className: 'container flex flex-wrap', style: { padding: '24px', paddingBottom: '120px' } }, 
-        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '16px', minHeight:'750px', padding: 0, overflow:'hidden' } }, 
+        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '10px', minHeight:'650px', padding: 0, overflow:'hidden' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚆 JR時刻表'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://jrhokkaidonorikae.com/ekihatsu/ekihatsu.php?node=%E6%9C%9D%E9%87%8C&linename=%EF%BC%AA%EF%BC%B2%E5%87%BD%E9%A4%A8%E6%9C%AC%E7%B7%9A" }))
         ), 
-        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '16px', minHeight:'750px', padding: 0, overflow:'hidden' } }, 
+        e('div', { className: 'widget-container', style: { flex: '1 1 400px', margin: '10px', minHeight:'650px', padding: 0, overflow:'hidden' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '🚌 バス時刻表'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://transfer.navitime.biz/chuo-bus/pc/diagram/BusCourseSearch?busstopId=00300196" }))
         )
@@ -452,7 +455,7 @@
 
     function CalendarTab() {
       return e('div', { className: 'container', style: { padding: '24px', paddingBottom: '120px' } }, 
-        e('div', { className: 'widget-container', style: { padding: 0, overflow: 'hidden', minHeight: '800px', margin: '16px' } }, 
+        e('div', { className: 'widget-container', style: { padding: 0, overflow: 'hidden', minHeight: '650px', margin: '10px' } }, 
           e('div', { style: { padding: '16px', fontWeight: '900', borderBottom: '1px solid var(--border)', background:'white' } }, '📅 TimeTree'), 
           e('div', { className: 'iframe-wrapper', style: { height: 'calc(100% - 53px)' } }, e('iframe', { src: "https://timetreeapp.com/" }))
         )
@@ -628,10 +631,10 @@
       var ts = [ {id:'main',n:'メイン',i:'🏠'}, {id:'wallet',n:'お財布',i:'💰'}, {id:'calendar',n:'カレンダー',i:'📅'}, {id:'shopping',n:'買物',i:'🛒'}, {id:'todo',n:'TODO',i:'📝'}, {id:'transit',n:'時刻表',i:'🚆'}, {id:'docs',n:'文書',i:'📄'} ];
       function rC() {
         if(tab==='main') return e('div', { className: 'container flex flex-col', style: { padding: '24px', paddingBottom: '120px' } }, 
-          e('div', { className: 'w-full', style: { marginBottom: '32px' } }, e(WeeklyCalendarWidget)), 
+          e('div', { className: 'w-full', style: { marginBottom: '20px' } }, e(WeeklyCalendarWidget)), 
           e('div', { className: 'flex flex-wrap' }, 
-            e('div', { style: { flex: '1 1 300px', minWidth: '300px', margin: '16px' } }, e(TransitWidget)), 
-            e('div', { style: { flex: '2 1 450px', minWidth: '400px', margin: '16px' } }, e(WeatherWidget))
+            e('div', { style: { flex: '1 1 300px', minWidth: '300px', margin: '10px' } }, e(TransitWidget)), 
+            e('div', { style: { flex: '2 1 450px', minWidth: '400px', margin: '10px' } }, e(WeatherWidget))
           )
         );
         if(tab==='wallet') return e(WalletTab);
